@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+    background: #2a2a2a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.pokedex-container {
+    display: flex;
+    position: relative;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    transform: scale(0.9);
+}
+
+.hinge {
+    width: 40px;
+    height: 340px;
+    background: 
+        linear-gradient(55deg, 
+            #707070 0%, 
+            #909090 20%, 
+            #606060 50%, 
+            #808080 80%);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 3px;
+    z-index: 2;
+    box-shadow: 
+        inset 0 0 10px rgba(0,0,0,0.3),
+        0 2px 5px rgba(0,0,0,0.5);
+}
+
+.panel {
+    width: 350px;
+    height: 550px;
+    background: 
+        linear-gradient(160deg, 
+            #d10000 0%, 
+            #a00000 30%, 
+            #8a0000 100%);
+    border-radius: 20px 8px 8px 20px;
+    padding: 25px;
+    box-sizing: border-box;
+    position: relative;
+    border: 4px solid #3a3a3a;
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.2),
+        0 5px 15px rgba(0,0,0,0.5);
+}
+
+.panel.right {
+    border-radius: 8px 20px 20px 8px;
+    background: 
+        linear-gradient(200deg, 
+            #d10000 0%, 
+            #a00000 30%, 
+            #8a0000 100%);
+}
+
+.screen-housing {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 25px 0;
+    position: relative;
+    box-shadow: 
+        inset 0 0 15px rgba(0,0,0,0.5),
+        0 3px 5px rgba(0,0,0,0.3);
+}
+
+.screen {
+    background: #8b9b6e;
+    border: 4px solid #4a5740;
+    border-radius: 8px;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(139, 155, 110, 0.3) 50%, 
+        rgba(0,0,0,0.2) 50%),
+        repeating-linear-gradient(
+            0deg,
+            rgba(0,0,0,0.1) 0px,
+            rgba(0,0,0,0.1) 1px,
+            transparent 1px,
+            transparent 4px);
+    pointer-events: none;
+}
+
+.d-pad {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+}
+
+.d-pad-base {
+    width: 100%;
+    height: 100%;
+    background: #404040;
+    border-radius: 15px;
+    position: absolute;
+    transform: rotate(45deg);
+    box-shadow: 
+        inset 0 0 10px rgba(0,0,0,0.3),
+        0 3px 5px rgba(0,0,0,0.3);
+}
+
+.d-pad-direction {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #505050;
+    border: none;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 
+        inset 0 -3px 5px rgba(0,0,0,0.2),
+        0 2px 3px rgba(0,0,0,0.3);
+}
+
+.d-pad-up { top: 0; left: 40px; border-radius: 8px 8px 0 0; }
+.d-pad-down { bottom: 0; left: 40px; border-radius: 0 0 8px 8px; }
+.d-pad-left { left: 0; top: 40px; border-radius: 8px 0 0 8px; }
+.d-pad-right { right: 0; top: 40px; border-radius: 0 8px 8px 0; }
+
+.action-buttons {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.action-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #888);
+    border: 4px solid #3a3a3a;
+    cursor: pointer;
+    box-shadow: 
+        inset 0 -3px 5px rgba(0,0,0,0.2),
+        0 5px 8px rgba(0,0,0,0.3);
+    transition: all 0.1s;
+}
+
+.action-button:active {
+    transform: scale(0.95);
+    box-shadow: 
+        inset 0 2px 3px rgba(0,0,0,0.2),
+        0 2px 3px rgba(0,0,0,0.3);
+}
+
+.utility-buttons {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.utility-button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #606060;
+    border: 2px solid #3a3a3a;
+    cursor: pointer;
+    box-shadow: 
+        inset 0 -3px 5px rgba(0,0,0,0.2),
+        0 3px 5px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+}
+
+.screw {
+    width: 15px;
+    height: 15px;
+    background: #505050;
+    border-radius: 50%;
+    position: absolute;
+    box-shadow: 
+        inset 2px 2px 3px rgba(255,255,255,0.2),
+        inset -2px -2px 3px rgba(0,0,0,0.5);
+}
+
+.screw::after {
+    content: "+";
+    position: absolute;
+    color: rgba(0,0,0,0.5);
+    font-size: 12px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(45deg);
+}
+
+.branding {
+    position: absolute;
+    bottom: 15px;
+    right: 30px;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.status-led {
+    width: 12px;
+    height: 12px;
+    background: #0f0;
+    border-radius: 50%;
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    box-shadow: 
+        0 0 10px #0f0,
+        inset 0 0 5px rgba(0,0,0,0.3);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+.camera {
+    width: 20px;
+    height: 20px;
+    background: #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    border: 2px solid #3a3a3a;
+    box-shadow: 
+        inset 0 0 5px rgba(255,255,255,0.2),
+        0 0 5px rgba(0,0,0,0.5);
+}
+
+.camera::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #333;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
