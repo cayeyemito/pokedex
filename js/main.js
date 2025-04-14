@@ -1,109 +1,210 @@
-// URL de la API
-const apiUrlAbilities = "https://pokeapi.co/api/v2/ability/1/";
-let abilities = []  // Cambié el nombre de 'companies' a 'abilities'
-const companyRequests = [];
+let guideChanged = false
+let shinyChanged = false
+let backgroundChanged = false
+let stat = 1
+let stat1 = document.getElementById("stat1")
+let stat2 = document.getElementById("stat2")
+let stat3 = document.getElementById("stat3")
+let stat4 = document.getElementById("stat4")
+let stat5 = document.getElementById("stat5")
+let statsScreen = document.getElementById("statScreen")
+let movementScreen = document.getElementById("movementScreen")
 
-const maxID = ; // Última ID a consultar
-const batchSize = 1; // Número de peticiones simultáneas
+function showGuide(){
+    let innerScreen = document.getElementById("inner-screen")
+    let innerScreenOverlay = document.getElementById("inner-screen-overlay")
+    let guideScreen = document.getElementById("guide-screen")
 
-// Función para esperar
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Función para obtener una habilidad
-async function fetchAbility(id) {
-  try {
-    const response = await fetch(`https://pokeapi.co/api/v2/ability/${id}/`);
-    if (!response.ok) throw new Error(`Error al obtener el recurso para la ID ${id}`);
-    
-    const data = await response.json();
-
-    let spanishName = data.names.find(name => name.language.name === "es")?.name ||
-                      data.names.find(name => name.language.name === "en")?.name;
-
-    // Obtener descripción en español o inglés
-    let spanishDescription = data.flavor_text_entries.find(flavor => flavor.language.name === "es")?.flavor_text ||
-                             data.flavor_text_entries.find(flavor => flavor.language.name === "en")?.flavor_text;
-
-    // Limpiar descripción
-    const cleanDescription = spanishDescription?.replace(/\n|\f/g, ' ').trim();
-
-    const pokemonList = data.pokemon.map(p => {
-        const urlParts = p.pokemon.url.split('/').filter(Boolean);
-        const pokemonId = parseInt(urlParts[urlParts.length - 1]); // Extraer ID del final de la URL
-        return {
-          id: pokemonId,
-          idAbility: data.id,
-          is_hidden: p.is_hidden
-        };
-    });
-
-    // Crear un nuevo objeto 'ability' para evitar sobrescritura
-    const ability = {
-      id: data.id,
-      nombre: spanishName,
-      descripcion: cleanDescription,
-      pokemons: pokemonList
-    };
-
-    console.log(ability); // Mostrar el objeto ability correctamente
-    
-    return ability; // Devuelve el objeto con los datos de la habilidad
-  } catch (error) {
-    console.error(`Error al obtener habilidad para la ID ${id}:`, error);
-    return null; // Devuelve null si hay un error
-  }
-}
-
-// Función para enviar las habilidades al servidor
-async function sendAbilitiesToServer() {
-    try {
-      const response = await fetch("./php/api.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "companies=" + encodeURIComponent(JSON.stringify(abilities))
-      });
-  
-      const data = await response.text();
-      console.log("Respuesta del servidor:", data);
-  
-      // Limpiar el array después de enviar los datos
-      abilities = [];
-    } catch (error) {
-      console.error("Error en la solicitud POST:", error);
+    if(!guideChanged){
+        innerScreen.style.filter = "blur(1.5rem)"
+        innerScreenOverlay.style.visibility = "blur(1.5rem)"
+        guideScreen.style.visibility = "visible"
+        guideChanged = true
+    } else{
+        innerScreen.style.filter = "blur(0)"
+        innerScreenOverlay.style.visibility = "blur(0)"
+        guideScreen.style.visibility = "hidden"
+        guideChanged = false
     }
-  }
-  
-
-// Función principal para obtener las habilidades en lotes
-async function fetchAbilitiesInBatches() {
-  for (let i = 1; i <= maxID; i += batchSize) {
-    const batchRequests = [];
-
-    // Crear un lote de promesas de fetch
-    for (let j = i; j < i + batchSize && j <= maxID; j++) {
-      batchRequests.push(fetchAbility(j));
-    }
-
-    // Esperar a que todas las solicitudes del lote terminen
-    const results = await Promise.allSettled(batchRequests);
-
-
-    // Filtrar resultados exitosos y agregarlos al array
-    abilities.push(...results.filter(r => r.status === "fulfilled" && r.value).map(r => r.value));
-
-    console.log(`Completado hasta la ID: ${Math.min(i + batchSize - 1, maxID)}`);
-
-    // Enviar los datos al servidor después de cada lote
-    await sendAbilitiesToServer();
-
-    // Esperar 1 segundo entre lotes para evitar sobrecarga
-    await delay(4000);
-  }
-
-  console.log("Todas las habilidades han sido procesadas.");
 }
 
-// Iniciar el proceso
-fetchAbilitiesInBatches();
+function showShiny(){
+    let innerScreenOverlay = document.getElementById("inner-screen-overlay")
+
+    if(!shinyChanged){
+        innerScreenOverlay.style.backgroundImage = "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/25.gif')"
+        shinyChanged = true
+    } else {
+        innerScreenOverlay.style.backgroundImage = "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif')"
+        shinyChanged = false
+    }
+}
+
+function changeBackground(){
+    let innerScreen = document.getElementById("inner-screen")
+
+    if(!backgroundChanged){
+        innerScreen.style.backgroundImage = 'url("img/tipos/electric/electric.gif")'
+        backgroundChanged = true
+    } else {
+        innerScreen.style.backgroundImage = "url('img/tipos/electric/electric.jpg')"
+        backgroundChanged = false
+    }
+}
+
+function passNextStat() {
+    if(stat === 1){
+        statsScreen.style.display = "none"
+        movementScreen.style.display = "flex"
+        stat2.style.transform = "scale(1.3)" 
+        stat1.style.transform = "scale(1)"
+        stat++
+    } else if (stat === 2){
+        stat3.style.transform = "scale(1.3)"
+        stat2.style.transform = "scale(1)"
+        stat++
+    } else if (stat === 3){
+        stat4.style.transform = "scale(1.3)"
+        stat3.style.transform = "scale(1)"
+        stat++
+    } else if (stat === 4){
+        stat5.style.transform = "scale(1.3)"
+        stat4.style.transform = "scale(1)"
+        stat++
+    } else {
+        statsScreen.style.display = "flex"
+        movementScreen.style.display = "none"
+        stat1.style.transform = "scale(1.3)"
+        stat5.style.transform = "scale(1)"
+        stat=1
+    }
+}
+
+function passPreviousStat() {
+    if(stat === 1){
+        statsScreen.style.display = "none"
+        movementScreen.style.display = "flex"
+        stat5.style.transform = "scale(1.3)" 
+        stat1.style.transform = "scale(1)"
+        stat = 5
+    } else if (stat === 2){
+        statsScreen.style.display = "flex"
+        movementScreen.style.display = "none"
+        stat1.style.transform = "scale(1.3)"
+        stat2.style.transform = "scale(1)"
+        stat--
+    } else if (stat === 3){
+        stat2.style.transform = "scale(1.3)"
+        stat3.style.transform = "scale(1)"
+        stat--
+    } else if (stat === 4){
+        stat3.style.transform = "scale(1.3)"
+        stat4.style.transform = "scale(1)"
+        stat--
+    } else {
+        stat4.style.transform = "scale(1.3)"
+        stat5.style.transform = "scale(1)"
+        stat--
+    }
+}
+
+function searchPokemonInput(number){
+    let pokeNameIdText = document.getElementById("pokemon-name-text")
+    let numberToTry = document.getElementById("pokemon-name-text").innerText
+    
+    if(numberToTry === '0' || isNaN(numberToTry)){
+        pokeNameIdText.innerText = number
+    } else{
+        numberToTry += number
+        if(parseInt(numberToTry)>1025){
+            pokeNameIdText.innerText = '1025'
+        }
+        else{
+            pokeNameIdText.innerText = numberToTry
+        }
+    }
+}
+
+function deleteLastNumber(){
+    let pokeNameIdText = document.getElementById("pokemon-name-text")
+    let numberToTry = document.getElementById("pokemon-name-text").innerText
+
+    if(isNaN(numberToTry)){
+    } else if (parseInt(numberToTry)>= 0 && parseInt(numberToTry)<10) {
+        pokeNameIdText.innerText = 'Charizard'
+    } else{
+        pokeNameIdText.innerText = numberToTry.substring(0, numberToTry.length - 1)
+    }
+}
+
+const ctx = document.getElementById('pokemonStatsChart').getContext('2d');
+const pokemonStats = {
+    labels: ['HP', 'Ataque', 'Defensa', 'Sp. Atk', 'Sp. Def', 'Vel.'],
+    datasets: [{
+    label: 'Stats base',
+    data: [80, 105, 70, 95, 85, 100], // <-- Reemplazá por los stats del Pokémon actual
+    backgroundColor: [
+        '#ff6384', // HP
+        '#ff9f40', // Attack
+        '#ffcd56', // Defense
+        '#4bc0c0', // Sp. Atk
+        '#36a2eb', // Sp. Def
+        '#9966ff'  // Speed
+    ],
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 8
+    }]
+};
+
+const config = {
+    type: 'bar',
+    data: pokemonStats,
+    options: {
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: '#222',
+                titleColor: '#fff',
+                bodyColor: '#fff'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }
+                },
+                x: {
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        }
+    }
+};
+
+getPokemonInfo(1)
+
+function getPokemonInfo(numeroPokedex) {
+    fetch(`get_pokemon.php?numero=${numeroPokedex}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Datos del Pokémon:", data);
+            // Aquí puedes actualizar tu HTML con los datos recibidos
+        })
+        .catch(error => {
+            console.error('Error al obtener datos:', error);
+        });
+}
+
+new Chart(ctx, config);

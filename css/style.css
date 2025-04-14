@@ -1,271 +1,1038 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* Reset y estilos globales */
+
+@font-face {
+    font-family: 'retro';
+    src: url(../fonts/VCR_OSD_MONO_1.001.ttf);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Press Start 2P", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-user-drag: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+html, body {
+    height: 100%;
+}
 
 body {
-    background: #2a2a2a;
+    background-image: url(../img/bg.png);
+    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    overflow: hidden;
+    padding: 10vh 0;
 }
 
-.pokedex-container {
-    display: flex;
+/* Contenedor principal
+    Se usa width: 80vw, pero se limita con max-width al ancho nativo del vector (1086px)
+    Además, usamos aspect-ratio para mantener la proporción original del viewBox (1086/720) */
+.main-wrapper {
     position: relative;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    width: 80vw;
+    max-width: 1086px;
+    aspect-ratio: 1086 / 720;
+    /* Para centrarlo si el ancho real es menor */
+    margin: 0 auto;
+}
+
+/* El SVG se ajusta al contenedor */
+.svg-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Los contenedores se posicionan sobre el SVG */
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    z-index: 2;
+}
+
+/* Configuración de los sub-contenedores */
+.left_container {
+    width: 50%;
+    height: 100%;
+}
+
+.top-left{
+    height: 23%;
+    width: 86.7%;
+    margin-left: 3.4%;
+    margin-top: 3.2%;
+    display: flex;
+}
+
+.blue-button-container{
+    position: relative;
+    height: 100%;
+    width: 35%;
+    display: flex;
+    justify-content: center; /* Alinea horizontalmente */
+    align-items: center;
+}
+
+.empty{
+    position: relative;
+    height: 100%;
+    width: 10%;
+}
+
+.empty3{
+    position: relative;
+    height: 100%;
+    width: 1%;
+}
+
+.empty4{
+    position: relative;
+    height: 100%;
+    width: 15%;
+}
+
+.blue-button{
+    background: radial-gradient(#ffffff, #9198e5);
+    height: 75%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 0.7vw solid #323232;
+    cursor: pointer;
+}
+
+.buttons-container{
+    margin-top: 2.7%;
+    position: relative;
+    height: 47%;
+    width: 35%;
+    display: flex;
+}
+
+.red-button-container, .yellow-button-container, .green-button-container{
+    position: relative;
+    height: 100%;
+    width: 33.33%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.red-button, .yellow-button, .green-button{
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    z-index: 4;
+}
+
+.red-button::after,
+.yellow-button::after,
+.green-button::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    width: 100%; /* Se extiende al 100% del elemento padre */
+    height: 100%;
+    opacity: 0; /* Inicia "apagado" */
+    pointer-events: none;
+}
+/* Botones con colores específicos y animaciones */
+.red-button::after {
+    background-color: #fe0000;
+    animation: blinkRed 1s infinite ease-in-out;
+}
+
+.yellow-button::after {
+    background-color: #fee900;
+    animation: blinkYellow 5s infinite ease-in-out;
+}
+
+.green-button::after {
+    background-color: #11fe00;
+    animation: blinkGreen 3s infinite ease-in-out;
+}
+
+/* Definición de las animaciones: parpadeo breve en puntos específicos del ciclo */
+@keyframes blinkRed {
+    0%, 70%, 100% { opacity: 0; }
+    75%, 85% { opacity: 1; }
+}
+
+@keyframes blinkYellow {
+    0%, 70%, 100% { opacity: 0; }
+    75%, 85% { opacity: 1; }
+}
+
+@keyframes blinkGreen {
+    0%, 70%, 100% { opacity: 0; }
+    75%, 85% { opacity: 1; }
+}
+
+.big{
+    height: 40%;
+}
+
+.little{
+    height: 20%;
+}
+
+.red-button2, .yellow-button2, .green-button2{
+    position: absolute;
+    height: 59%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 0.2vw solid #000000;
+    z-index: 3;
+    border-top: none;
+    border-left: none;
+}
+
+.big1{
+    height: 59%;
+}
+
+.little1{
+    height: 39%;
+}
+
+.softRed{
+    background-color: #ff5b5b;
+}
+
+.red{
+    background-color: #fe0000;
+}
+
+.softYellow{
+    background-color: #ffef94;
+}
+
+.yellow{
+    background-color: #fee900;
+}
+
+.softGreen{
+    background-color: rgb(163, 255, 127);
+}
+
+.green{
+    background-color: #11fe00;
+}
+
+.strong-green{
+    background-color: #228a1b;
+}
+
+.orange{
+    background-color: rgb(204, 106, 21);
+}
+
+.empty2{
+    position: relative;
+    height: 3%;
+    width: 86.7%;
+    margin-left: 3.4%;
+}
+
+.bottom-left{
+    position: relative;
+    height: 67.5%;
+    width: 86.7%;
+    margin-left: 3.4%;
+    display: flex;
+    flex-direction: column;
+}
+
+.screen-container{
+    position: relative;
+    height: 65%;
+    width: 90%;
+    margin-left: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.screen{
+    height: 90%;
+    width: 90%;
+    background-color: rgb(174, 174, 174);
+    border-radius: 6vh;
+    border: 0.7vw solid #323232;
+}
+
+.top-decorations-container{
+    position: relative;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.circle-container{
+    position: relative;
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.little-gap{
+    width: 5%;
+}
+
+.circle{
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #323232;
+}
+
+.normal{
+    height: 50%;
+}
+
+.circleBig{
+    height: 80%;
+}
+
+.inner-screen-container{
+    position: relative;
+    width: 100%;
+    height: 72%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.inner-screen{
+    position: absolute;
+    height: 100%;
+    width: 80.6%;
+    border-radius: 6vh;
+    border: 0.7vw solid #323232;
+    background-image: url("../img/tipos/normal/normal.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.inner-screen-overlay{
+    position: absolute;
+    height: 70%;
+    width: 74.5%;
+    border-radius: 5.8vh;
+    background-image: url("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.inner-screen-overlay-glass{
+    position: absolute;
+    height: 90%;
+    width: 74.7%;
+    border-radius: 5.1vh;
+    background: rgba(255, 255, 255, 0.30);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+}
+
+.guide-screen{
+    position: absolute;
+    height: 100%;
+    width: 80.6%;
+    border-radius: 6vh;
+    border: 0.7vw solid #323232;
+    visibility: hidden;
+    background: linear-gradient(
+        135deg, 
+        rgba(0, 255, 255, 0.5), 
+        rgba(0, 255, 255, 0.2)
+    );
+    opacity: 0.5;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5),
+                0 0 40px rgba(0, 255, 255, 0.2);
+    animation: flicker 3s infinite alternate;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  
+.contenedor::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 0.95;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5),
+                    0 0 40px rgba(0, 255, 255, 0.2);
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.7),
+                    0 0 50px rgba(0, 255, 255, 0.4);
+    }
+    100% {
+        opacity: 0.92;
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.3),
+                    0 0 30px rgba(0, 255, 255, 0.1);
+    }
+}
+
+.guide-text{
+    margin: 5%;
+    font-size: clamp(0.5rem, 1.5vw, 1rem);
+    font-family: 'retro', sans-serif;
+}
+
+.bottom-decorations-container{
+    position: relative;
+    width: 100%;
+    height: 18%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.on-off-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.on-off-button{
+    position: absolute;
+    height: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #fe0000;
+    border: 0.3vw solid #323232;
+    cursor: pointer;
+}
+
+.line-container{
+    position: relative;
+    width: 30%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+}
+
+.line-empty{
+    position: relative;
+    width: 90%;
+    height: 14.28%;
+}
+
+.line{
+    position: relative;
+    width: 85%;
+    height: 14.28%;
+    border-radius: 0.8vw;
+    background-color: #323232;
+}
+
+.all-buttons-container{
+    position: relative;
+    height: 35%;
+    width: 90%;
+    margin-left: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-row{
+    position: relative;
+    height: 100%;
+    width: 20%;
+}
+
+.guide-button-container{
+    position: relative;
+    height: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.guide-button{
+    position: absolute;
+    height: 50%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #318dba;
+    border: 0.8vh solid #0a1480;
+    border-top: none;
+    border-left: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.guide-button2{
+    position: absolute;
+    height: 75%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #323232;
+    border-top: none;
+    border-left: none;
+}
+
+.guide-text-button{
+    font-size: clamp(0.5rem, 2.5vw, 2rem);
+    color: #323232;
+}
+
+.shiny-text-button {
+    font-size: clamp(0.3rem, 1.5vw, 1rem);
+    /* Definimos un gradiente que tenga zonas brillantes y normales */
+    background: linear-gradient(
+        90deg,
+        #ff2121, 
+        #ff5b5b, 
+        #fff12b,
+        #ffed9b,
+        #ff2121
+    );
+    background-size: 200% auto; /* Permite animar el movimiento del gradiente */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shiny 2s linear infinite;
+}
+
+/* Animación que desplaza el fondo para lograr el efecto de "shiny" */
+@keyframes shiny {
+    0% {
+        background-position: 200% center;
+    }
+    100% {
+        background-position: -200% center;
+    }
+}
+
+.fondo-text-button{
+    font-size: clamp(0.3rem, 1.5vw, 1rem);
+    color: #323232;
+}
+
+.pokemon-name-text{
+    font-size: clamp(0.5rem, 2.5vw, 2rem);
+    color: #323232;
+}
+
+.led-container{
+    position: relative;
+    height: 30%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.yellow-led-container, .green-led-container{
+    position: relative;
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.middle-row{
+    position: relative;
+    height: 100%;
+    width: 47%;
+}
+
+.some-buttons-container{
+    position: relative;
+    height: 40%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.thin-green-button-container, .thin-orange-button-container{
+    position: relative;
+    height: 100%;
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.thin-green-button, .thin-orange-button{
+    position: absolute;
+    height: 45%;
+    width: 100%;
+    border-radius: 2vh;
+    border: 0.8vh solid #323232;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.name-pokemon-text-container{
+    position: relative;
+    height: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.name-container{
+    position: relative;
+    height: 90%;
+    width: 100%;
+    border-radius: 2vh;
+    border: 0.8vh solid #323232;
+}
+
+.screen-name-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border-radius: 1.6vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen-name-overlay{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.4vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    background-color: rgba(49, 135, 15, 0.75);
+}
+
+.right-row{
+    position: relative;
+    height: 100%;
+    width: 33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.dpad-top-container, .dpad-middle-container, .dpad-bottom-container{
+    position: relative;
+    width: 100%;
+    height: 33.33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dpad-middle-container{
+    height: 26%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dpad-top{
+    margin-top: 17%;
+    height: 60%;
+    width: 39%;
+    border: #323232 0.7vh solid;
+    border-bottom: none;
+    background-color: #696969;
+}
+
+.dpad-left{
+    height: 100%;
+    width: 28%;
+    border: #323232 0.7vh solid;
+    border-right: none;
+    background-color: #696969;
+}
+
+.dpad-middle{
+    height: 100%;
+    width: 32%;
+    background-color: #696969;
+    cursor: pointer;
+}
+
+.dpad-right{
+    height: 100%;
+    width: 28%;
+    border: #323232 0.7vh solid;
+    border-left: none;
+    background-color: #696969;
+}
+
+.dpad-bottom{
+    height: 60%;
+    width: 39%;
+    border: #323232 0.7vh solid;
+    border-top: none;
+    background-color: #696969;
+    margin-bottom: 17%;
+}
+
+.dpad-top, .dpad-left, .dpad-middle, .dpad-right, .dpad-bottom {
+    aspect-ratio: 1 / 1; /* Ajusta la proporción según lo necesites */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.directional {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.down:active {
+    transform: translateY(2px);
+    filter: brightness(90%);
+}
+
+.up:active {
+    transform: translateY(-2px);
+    filter: brightness(90%);
+}
+
+.left:active {
+    transform: translateX(-2px);
+    filter: brightness(90%);
+}
+
+.right:active {
+    transform: translateX(2px);
+    filter: brightness(90%);
+}
+
+.circleBig:active{
+    filter: brightness(90%);
+    transform: scale(1.1);
+}
+
+.up {
+    position: relative;
+    border-width: 0 2vh 3vh 2vh;
+    height: 80%;
+    width: 60%;
+    border-color: transparent transparent #323232 transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.down {
+    position: relative;
+    height: 80%;
+    width: 60%;
+    border-width: 3vh 2vh 0 2vh;
+    border-style: solid;
+    border-color: #323232 transparent transparent transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.left {
+    position: relative;
+    height: 80%;
+    width: 60%;
+    border-width: 2vh 3vh 2vh 0;
+    border-style: solid;
+    border-color: transparent #323232 transparent transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.right {
+    position: relative;
+    height: 80%;
+    width: 60%;
+    /* Valores en vh para que se adapten al tamaño de la ventana */
+    border-width: 2vh 0 2vh 3vh; /* top, right, bottom, left */
+    border-style: solid;
+    border-color: transparent transparent transparent #323232;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.right_container {
+    width: 50%;
+    height: 72.8%;
+    margin-top: 18%;
+}
+
+.right-inner-screen-container{
+    position: relative;
+    margin-left: 9.6%;
+    width: 87%;
+    height: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-inner-screen{
+    margin-top: 5.6%;
+    position: absolute;
+    height: 90%;
+    width: 80.6%;
+    border-radius: 6vh;
+    border: 0.7vw solid #323232;
+    background-color: rgb(37, 34, 34);
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.inner-screen-overlay-glass2{
+    margin-top: 6%;
+    position: absolute;
+    height: 80%;
+    width: 76.5%;
+    border-radius: 4.6vh;
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    z-index: 16;
+}
+
+.pokemon-stats-chart-container, .pokemon-movements-container{
+    position: relative;
+    height: 90%; 
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.first-circle{
+    transform: scale(1.3);
+}
+
+.pokemon-movements-container{
+    display: none;
+}
+
+.pokemon-stat-graphic{
+    position: relative;
+    width: 80%;
+}
+
+.pokemon-stat-position-container{
+    position: relative;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle-stat{
+    position: absolute;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #b9b9b9;
+    height: 50%;
+}
+
+.numerical-buttons-container{
+    position: relative;
+    margin-left: 9.6%;
+    width: 87%;
+    height: 28%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.top-numerical-button-container, .bottom-numerical-button-container{
+    position: relative;
+    width: 80%;
+    height: 33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-container{
+    position: relative;
+    width: 20%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #323232;
+}
+
+.top-left-button{
+    border-radius: 2vh 0 0 0;
+}
+
+.top-right-button{
+    border-radius: 0 2vh 0 0;
+}
+
+.bottom-left-button{
+    border-radius: 0 0 0 2vh;
+}
+
+.bottom-right-button{
+    border-radius: 0 0 2vh 0;
+}
+
+.top{
+    margin-top: 2.4%;
+}
+
+.bottom{
+    margin-bottom: 2.4%;
+}
+
+.top2{
+    margin-top: 15%;
+}
+
+.bottom2{
+    margin-bottom: 15%;
+}
+
+.button{
+    position: absolute;
+    width: 82%;
+    height: 60%;
+    background: linear-gradient(#ffffff, #09cfe4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    gap: -10%;
+}
+
+.button:active{
+    filter: brightness(70%);
     transform: scale(0.9);
 }
 
-.hinge {
-    width: 40px;
-    height: 340px;
-    background: 
-        linear-gradient(55deg, 
-            #707070 0%, 
-            #909090 20%, 
-            #606060 50%, 
-            #808080 80%);
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 3px;
-    z-index: 2;
-    box-shadow: 
-        inset 0 0 10px rgba(0,0,0,0.3),
-        0 2px 5px rgba(0,0,0,0.5);
-}
-
-.panel {
-    width: 350px;
-    height: 550px;
-    background: 
-        linear-gradient(160deg, 
-            #d10000 0%, 
-            #a00000 30%, 
-            #8a0000 100%);
-    border-radius: 20px 8px 8px 20px;
-    padding: 25px;
-    box-sizing: border-box;
+.last-elements-container{
     position: relative;
-    border: 4px solid #3a3a3a;
-    box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.2),
-        0 5px 15px rgba(0,0,0,0.5);
-}
-
-.panel.right {
-    border-radius: 8px 20px 20px 8px;
-    background: 
-        linear-gradient(200deg, 
-            #d10000 0%, 
-            #a00000 30%, 
-            #8a0000 100%);
-}
-
-.screen-housing {
-    background: #1a1a1a;
-    border-radius: 12px;
-    padding: 15px;
-    margin: 25px 0;
-    position: relative;
-    box-shadow: 
-        inset 0 0 15px rgba(0,0,0,0.5),
-        0 3px 5px rgba(0,0,0,0.3);
-}
-
-.screen {
-    background: #8b9b6e;
-    border: 4px solid #4a5740;
-    border-radius: 8px;
-    height: 250px;
-    position: relative;
-    overflow: hidden;
-}
-
-.screen-overlay {
-    position: absolute;
+    height: 20%;
     width: 100%;
-    height: 100%;
-    background: 
-        linear-gradient(rgba(139, 155, 110, 0.3) 50%, 
-        rgba(0,0,0,0.2) 50%),
-        repeating-linear-gradient(
-            0deg,
-            rgba(0,0,0,0.1) 0px,
-            rgba(0,0,0,0.1) 1px,
-            transparent 1px,
-            transparent 4px);
-    pointer-events: none;
-}
-
-.d-pad {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 20px auto;
-}
-
-.d-pad-base {
-    width: 100%;
-    height: 100%;
-    background: #404040;
-    border-radius: 15px;
-    position: absolute;
-    transform: rotate(45deg);
-    box-shadow: 
-        inset 0 0 10px rgba(0,0,0,0.3),
-        0 3px 5px rgba(0,0,0,0.3);
-}
-
-.d-pad-direction {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: #505050;
-    border: none;
-    cursor: pointer;
-    transition: all 0.1s;
-    box-shadow: 
-        inset 0 -3px 5px rgba(0,0,0,0.2),
-        0 2px 3px rgba(0,0,0,0.3);
-}
-
-.d-pad-up { top: 0; left: 40px; border-radius: 8px 8px 0 0; }
-.d-pad-down { bottom: 0; left: 40px; border-radius: 0 0 8px 8px; }
-.d-pad-left { left: 0; top: 40px; border-radius: 8px 0 0 8px; }
-.d-pad-right { right: 0; top: 40px; border-radius: 0 8px 8px 0; }
-
-.action-buttons {
-    position: absolute;
-    right: 30px;
-    bottom: 30px;
     display: flex;
-    gap: 20px;
-}
-
-.action-button {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #fff, #888);
-    border: 4px solid #3a3a3a;
-    cursor: pointer;
-    box-shadow: 
-        inset 0 -3px 5px rgba(0,0,0,0.2),
-        0 5px 8px rgba(0,0,0,0.3);
-    transition: all 0.1s;
-}
-
-.action-button:active {
-    transform: scale(0.95);
-    box-shadow: 
-        inset 0 2px 3px rgba(0,0,0,0.2),
-        0 2px 3px rgba(0,0,0,0.3);
-}
-
-.utility-buttons {
-    position: absolute;
-    left: 30px;
-    bottom: 30px;
-    display: flex;
-    gap: 15px;
-}
-
-.utility-button {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background: #606060;
-    border: 2px solid #3a3a3a;
-    cursor: pointer;
-    box-shadow: 
-        inset 0 -3px 5px rgba(0,0,0,0.2),
-        0 3px 5px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
     justify-content: center;
-    color: white;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.8rem;
+    align-items: center;
 }
 
-.screw {
-    width: 15px;
-    height: 15px;
-    background: #505050;
-    border-radius: 50%;
-    position: absolute;
-    box-shadow: 
-        inset 2px 2px 3px rgba(255,255,255,0.2),
-        inset -2px -2px 3px rgba(0,0,0,0.5);
-}
-
-.screw::after {
-    content: "+";
-    position: absolute;
-    color: rgba(0,0,0,0.5);
-    font-size: 12px;
-    width: 100%;
+.search-erase-button-container{
+    position: relative;
+    width: 50%;
     height: 100%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    transform: rotate(45deg);
+    align-items: center;
 }
 
-.branding {
-    position: absolute;
-    bottom: 15px;
-    right: 30px;
-    color: #fff;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.6rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+.search-button-container, .erase-button-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.status-led {
-    width: 12px;
-    height: 12px;
-    background: #0f0;
-    border-radius: 50%;
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    box-shadow: 
-        0 0 10px #0f0,
-        inset 0 0 5px rgba(0,0,0,0.3);
-    animation: pulse 1.5s infinite;
+.circleBig2{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
-@keyframes pulse {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.3; }
-    100% { opacity: 0.8; }
+.circleBig2:active{
+    filter: brightness(70%);
+    transform: scale(0.9);
 }
 
-.camera {
-    width: 20px;
-    height: 20px;
-    background: #000;
-    border-radius: 50%;
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    border: 2px solid #3a3a3a;
-    box-shadow: 
-        inset 0 0 5px rgba(255,255,255,0.2),
-        0 0 5px rgba(0,0,0,0.5);
+.littleIcon{
+    width: 50%;
+    height: 50%;
 }
 
-.camera::after {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #333;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.number-button-text{
+    font-size: clamp(0.5rem, 1.5vw, 1rem);
+    font-family: 'retro', sans-serif;
+}
+
+.line-container-right{
+    position: relative;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.line2{
+    position: relative;
+    width: 20%;
+    height: 20%;
+    border-radius: 0.8vw;
+    background-color: #323232;
+}
+
+.bottom-right-buttons-container{
+    position: relative;
+    margin-left: 9.6%;
+    width: 87%;
+    height: 29%;
+    background-color: rgba(0, 255, 255, 0.30);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

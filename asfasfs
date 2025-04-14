@@ -1,0 +1,130 @@
+CREATE VIEW pokemon_all_info AS    
+    WITH RECURSIVE PreEvolutionChain AS (
+      SELECT 
+        pe.id_pokemon AS pre_id,
+        pe.id_evolucion AS final_id,
+        CAST(
+          CONCAT(
+            pe.id_pokemon, '<-', pe.metodo,
+            IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+            IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+            '<-', pe.id_evolucion
+          ) AS CHAR(1000)
+        ) AS chain,
+        0 AS step
+      FROM Pokemon_Evolucion pe
+      WHERE pe.id_evolucion IS NOT NULL
+      UNION ALL
+      SELECT
+        pe.id_pokemon AS pre_id,
+        rec.final_id,
+        CONCAT(
+          pe.id_pokemon, '<-', pe.metodo,
+          IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+          IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+          '<-', rec.chain
+        ) AS chain,
+        rec.step + 1
+      FROM PreEvolutionChain rec
+      INNER JOIN Pokemon_Evolucion pe ON pe.id_evolucion = rec.pre_id
+    ),
+    EvolutionChain AS (
+        SELECT 
+            pe.id_pokemon AS original_id,
+            pe.id_pokemon AS current_id,
+            CAST(pe.id AS CHAR(1000)) AS chain,
+            0 AS step
+        FROM Pokemon_Evolucion pe
+        WHERE pe.id_evolucion IS NOT NULL
+
+        UNION ALL
+
+        SELECT
+            ec.original_id,
+            pe.id_evolucion,
+            IF(pe.id_evolucion IS NOT NULL,
+                CONCAT(
+                    ec.chain,
+                    '->',
+                    pe.metodo,
+                    IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+                    IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+                    '->', pe.id_evolucion
+                ),
+                ec.chain
+            ) AS chain,
+            ec.step + 1
+        FROM EvolutionChain ec
+        INNER JOIN Pokemon_Evolucion pe 
+            ON ec.current_id = pe.id_pokemon    
+    ),
+    todasHabilidades AS (
+        SELECT GROUP_CONCAT(h.id) AS habilidades, hp.id_pokemon
+        FROM Habilidades h
+        INNER JOIN Habilidades_Pokemon hp ON h.id = hp.id_habilidad
+        GROUP BY hp.id_pokemon
+    ),
+    movimientosHuevo AS (
+        SELECT GROUP_CONCAT(m.id) AS movHuevo, mp.id_pokemon
+        FROM Movimientos m
+        INNER JOIN Movimientos_Pokemon mp ON m.id = mp.id_movimiento
+        WHERE mp.metodo_aprendizaje = 'egg'
+        GROUP BY mp.id_pokemon
+    ),
+    movimientosLevelUp AS (
+        SELECT GROUP_CONCAT(m.id, "-", mp.nivel) AS movLevel, mp.id_pokemon
+        FROM Movimientos m
+        INNER JOIN Movimientos_Pokemon mp ON m.id = mp.id_movimiento
+        WHERE mp.metodo_aprendizaje = 'level-up'
+        GROUP BY mp.id_pokemon
+    ),
+    movimientosTutor AS (
+        SELECT GROUP_CONCAT(m.id) AS movTutor, mp.id_pokemon
+        FROM Movimientos m
+        INNER JOIN Movimientos_Pokemon mp ON m.id = mp.id_movimiento
+        WHERE mp.metodo_aprendizaje = 'tutor'
+        GROUP BY mp.id_pokemon
+    ),
+    movimientosMaquina AS (
+        SELECT GROUP_CONCAT(m.id) AS movMaquina, mp.id_pokemon
+        FROM Movimientos m
+        INNER JOIN Movimientos_Pokemon mp ON m.id = mp.id_movimiento
+        WHERE mp.metodo_aprendizaje = 'machine'
+        GROUP BY mp.id_pokemon
+    )
+    SELECT p.id AS numero_pokedex, p.nombre, p.descripcion, p.grito, p.imagen, p.peso, p.altura, p.hp, p.ataque_f, p.ataque_e, 
+    p.defensa_f, p.defensa_e, p.velocidad, p.tipo, p.tipo_secundario, p.imagen_shiny, th.habilidades, mh.movHuevo,
+    mlu.movLevel, mt.movTutor, mm.movMaquina, GROUP_CONCAT(fe.id) AS formaEspecial, GROUP_CONCAT(fe.nombre), g.nombre_region,
+    ec.chain AS evolutions, prec.chain AS preevolutions
+    FROM Pokemon p
+    INNER JOIN todasHabilidades th ON    th.id_pokemon = p.id
+    INNER JOIN movimientosHuevo mh ON mh.id_pokemon = p.id
+    INNER JOIN movimientosLevelUp mlu ON mlu.id_pokemon = p.id
+    INNER JOIN movimientosTutor mt ON mt.id_pokemon = p.id
+    INNER JOIN movimientosMaquina mm ON mm.id_pokemon = p.id
+    LEFT JOIN FormasEspeciales fe ON fe.id_pokemon_original = p.id
+    INNER JOIN Generacion g ON p.generacion = g.id
+    LEFT JOIN EvolutionChain ec ON ec.original_id = p.id
+    LEFT JOIN (
+        SELECT 
+            original_id, 
+            MAX(step) - 1 AS max_step -- Obtenemos el penúltimo paso
+        FROM EvolutionChain
+        GROUP BY original_id
+    ) max_ec 
+        ON ec.original_id = max_ec.original_id 
+        AND ec.step = max_ec.max_step
+    LEFT JOIN (
+      SELECT 
+          prec.final_id,
+          prec.pre_id,
+          prec.chain,
+          prec.step
+      FROM PreEvolutionChain prec
+      INNER JOIN (
+          SELECT final_id, MAX(step) AS max_step
+          FROM PreEvolutionChain
+          GROUP BY final_id
+      ) precmax ON prec.final_id = precmax.final_id AND prec.step = precmax.max_step
+    ) prec ON prec.final_id = p.id
+    GROUP BY p.id

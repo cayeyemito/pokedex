@@ -1,56 +1,55 @@
 <?php
+// Verificar que los datos se están recibiendo correctamente
 if (isset($_POST['companies'])) {
+    echo "Datos recibidos correctamente.\n"; // Agrega este mensaje para depurar
     $abilities = json_decode($_POST['companies'], true);
+    
+    if (!$abilities) {
+        echo "Error al decodificar JSON: " . json_last_error_msg() . "\n";
+        exit;
+    }
 
     include 'db.php';
 
-    $stmt_insert = $conn->prepare("INSERT INTO Habilidades (id, nombre, descripcion) VALUES (?, ?, ?)");
-    $stmt_insert2 = $conn->prepare("INSERT INTO Habilidades_Pokemon (id_pokemon, id_habilidad, oculta) VALUES (?, ?, ?)");
+    // Preparar las sentencias
+    // Preparar la consulta correctamente con backticks (`)
+    $stmt_update = $conn->prepare("UPDATE `FormasEspeciales` SET `imagen_shiny` = ? WHERE `id` = ?");
+    $stmt_update2 = $conn->prepare("UPDATE `FormasEspeciales` SET `id_pokemon_original` = ? WHERE `id` = ?");
 
-    foreach ($abilities as $abilitie) {
-
-        echo "Habilidad: {$abilitie['nombre']} - Pokémon: " . count($abilitie['pokemons']) . "\n";
-        
-        foreach ($abilitie['pokemons'] as $poke) {
-            echo "Insertando Pokémon con ID: {$poke['id']} - Oculta: {$poke['is_hidden']}\n";
-        }
-
-        $stmt_insert->bind_param(
-            "iss",
-            $abilitie['id'],
-            $abilitie['nombre'],
-            $abilitie['descripcion']
-        );
-
-        if ($stmt_insert->execute()) {
-            echo "Habilidad '{$abilitie['nombre']}' insertada correctamente.\n";
-        } else {
-            echo "Error al insertar habilidad '{$abilitie['nombre']}': " . $stmt_insert->error . "\n";
-        }
-
-        if (!isset($abilitie['pokemons']) || !is_array($abilitie['pokemons'])) continue;
-
-        foreach ($abilitie['pokemons'] as $poke) {
-            $stmt_insert2->bind_param(
-                "iis",
-                $poke['id'],
-                $abilitie['id'],
-                $poke['is_hidden']
-            );
-
-            if (!$stmt_insert2->execute()) {
-                echo "Error al insertar Pokémon con ID {$poke['id']} para habilidad {$abilitie['id']}: " . $stmt_insert2->error . "\n";
-            }
-        }
-        echo "Habilidad: {$abilitie['nombre']} - Pokémon: " . count($abilitie['pokemons']) . "\n";
+    if (!$stmt_update || !$stmt_update2) {
+        die("Error al preparar las consultas: " . $conn->error);
     }
 
-    $stmt_insert->close();
-    $stmt_insert2->close();
+    // Procesar cada habilidad
+    foreach ($abilities as $abilitie) {
+        echo "Procesando Pokémon ID: " . $abilitie['id'] . "\n";
+
+        // Asumimos que tienes el ID en $abilitie['id']
+        $stmt_update->bind_param("si", $abilitie['imagen_shiny'], $abilitie['id']);
+
+        if ($stmt_update->execute()) {
+            echo "Pokémon '{$abilitie['id']}' actualizado su imagen correctamente.\n";
+        } else {
+            echo "Error al actualizar Pokémon ID '{$abilitie['id']}': " . $stmt_update->error . "\n";
+        }
+
+        $stmt_update2->bind_param("ii", $abilitie['pokemon_id_original'], $abilitie['id']);
+
+        if ($stmt_update2->execute()) {
+            echo "Pokémon '{$abilitie['id']}' actualizado su id original correctamente.\n";
+        } else {
+            echo "Error al actualizar Pokémon ID '{$abilitie['id']}': " . $stmt_update2->error . "\n";
+        }
+    }
+
+    // Cerrar la sentencia y conexión fuera del bucle
+    $stmt_update->close();
+    $stmt_update2->close();
     $conn->close();
 
     echo "Proceso completado.\n";
 } else {
-    echo "No se recibieron compañías.";
+    echo "No se recibieron compañías.\n";
 }
+
 ?>

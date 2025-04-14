@@ -1,0 +1,84 @@
+.statics-inner-screen-container{
+    position: absolute;
+    height: 90%;
+    width: 80.6%;
+    border-radius: 6vh;
+    border: 0.7vw solid #323232;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.ability-static-screen-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    border-radius: 4.5vh 0 0 4.5vh;
+    cursor: pointer;
+    text-align: center;
+    background-color: grey;
+}
+
+.movement-static-screen-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    cursor: pointer;
+    text-align: center;
+    background-color: rgb(73, 72, 72);
+}
+
+.stats-static-screen-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    cursor: pointer;
+    text-align: center;
+    background-color: grey;
+}
+
+.evolution-static-screen-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    cursor: pointer;
+    text-align: center;
+    background-color: rgb(73, 72, 72);
+}
+
+.map-static-screen-container{
+    position: relative;
+    width: 20%;
+    height: 100%;
+    border-radius: 0 4.5vh 4.5vh 0;
+    cursor: pointer;
+    text-align: center;
+    background-color: grey;
+}
+
+.ability-static-screen-container:active, .movement-static-screen-container:active, .map-static-screen-container:active, .evolution-static-screen-container:active, .stats-static-screen-container:active{
+    filter: brightness(90%);
+}
+
+.littleIcon{
+    width: 1.2vw;
+    height: 2.6vh;
+    margin-top: 0.6vh;
+}
+
+/* Pantallas pequeñas: menos margen */
+@media (max-width: 768px) {
+    .littleIcon {
+        width: 0.8vw;
+        height: 2.2vh;
+        margin-top: 0.1vh;
+    }
+
+    .right-inner-screen{
+        position: absolute;
+        width: 80.6%;
+        border-radius: 5vh;
+        height: 71%;
+    }
+}
