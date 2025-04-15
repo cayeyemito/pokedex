@@ -9,7 +9,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Press Start 2P", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "retro","Press Start 2P", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     -webkit-user-drag: none;
 }
 
@@ -602,7 +602,7 @@ body {
 }
 
 .pokemon-name-text{
-    font-size: clamp(0.5rem, 2.5vw, 2rem);
+    font-size: clamp(0.5rem, 2vw, 1.6rem);
     color: #323232;
 }
 
@@ -923,27 +923,49 @@ body {
     align-items: center;
 }
 
+.ability-container{
+    margin-left: 3%;
+}
+
 .basic-info-container{
     flex-direction: column;
-    margin-top: 5%;
     height: 90% !important;
-}
-
-.ability-container{
-}
-
-.tittle-container, .text-container{
-    position: relative;
-    height: 16.66%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
 }
 
 .info-text-tittle{
     font-size: clamp(0.5rem, 1.4vw, 0.9rem);
     color:#ff5b5b;
     font-family: 'retro', sans-serif;
+}
+
+.tipo, .info{
+    position: relative;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info{
+    margin-left: 15%;
+    margin-top: 5%;
+}
+
+.tittle-container, .text-container{
+    position: relative;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tittle, .text{
+    position: relative;
+    width: 35%;
+    height: 100%;
 }
 
 .info-text{
@@ -960,6 +982,71 @@ body {
     justify-content: center;
     align-items: center;
     border-radius: 5vw;
+}
+
+.ability{
+    height: 100% !important;
+    flex-direction: column;
+}
+
+.ability-text-tittle-container, .ability-text-container{
+    position: relative;
+    width: 100%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-with-icon {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'retro', sans-serif;
+    font-size: clamp(0.2rem, 0.8vw, 0.7rem);
+    word-break: break-word;
+    position: relative;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.iconito {
+    width: 1.2vw;
+    aspect-ratio: 1 / 1;
+    margin-left: 0.5vw;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    max-width: clamp(10vw, 30vw, 15vw);
+    background-color: #5c5c5c;
+    color: #fff;
+    text-align: center;
+    padding: 0.5vh 0.8vw;
+    border-radius: 0.5vh;
+
+    position: absolute;
+    z-index: 10;
+    bottom: 120%; /* por encima del icono */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    transition: opacity 0.3s;
+    font-size: clamp(0.4rem, 1.2vw, 0.7rem);
+    white-space: normal;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.line-ability{
+    text-decoration: underline;
 }
 
 .littleIconTipo{
@@ -991,6 +1078,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 0.2vh;
+    border-top: 0.7vh solid #323232;
 }
 
 .circle-stat{
@@ -998,7 +1087,7 @@ body {
     aspect-ratio: 1;
     border-radius: 50%;
     background-color: #b9b9b9;
-    height: 50%;
+    height: 70%;
 }
 
 .numerical-buttons-container{
@@ -1152,8 +1241,206 @@ body {
     margin-left: 9.6%;
     width: 87%;
     height: 29%;
-    background-color: rgba(0, 255, 255, 0.30);
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+.top-right-buttons-container, .bottom-right-things-container{
+    position: relative;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pad-pokemon-container, .cry-button-container{
+    position: relative;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pad-pokemon-container{
+    gap: 0; /* Asegura que no haya separación */
+    box-sizing: border-box;
+}
+
+.cry-button{
+    position: absolute;
+    height: 50%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: rgb(158, 101, 21);
+    border: 0.4vh solid #ffceab;
+    border-bottom: none;
+    border-right: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.cry-button:active{
+    filter: brightness(70%);
+    transform: scale(0.9);
+}
+
+.littleIconCry{
+    width: 75%;
+    aspect-ratio: 1/1;
+}
+
+.hide-content {
+    display: none;
+}
+
+.right-pad, .left-pad{
+    position: relative;
+    width: 50%;
+    height: 80%;
+    border: 0.6vh solid #323232;
+    box-sizing: border-box;
+    background-color: #5c5c5c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-pad{
+    border-left: none;
+    border-radius: 0 2vh 2vh 0;
+}
+
+.left-pad{
+    border-right: none;
+    border-radius: 2vh 0 0 2vh;
+}
+
+.arrow-icon{
+    height: 80%;
+    width: 60%;
+    cursor: pointer;
+}
+
+.arrow-icon:active{
+    filter: brightness(70%);
+    transform: scale(0.9);
+}
+
+.pad-pokemon-container::after {
+    content: "";
+    position: absolute;
+    width: 0.6vh;
+    height: 80%;
+    background-color: #323232;
+    left: 50%;
+    top: 10%; /* porque height: 80% */
+    z-index: 3;
+}
+
+.level-movements, .egg-movements, .machine-movements, .tutor-movements{
+    position: relative;
+    width: 20%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icono-movimientos{
+    height: 70%;
+    width: 70%;
+    cursor: pointer;
+}
+
+.white{
+    filter: brightness(0) invert(1);
+}
+
+.flex-direction{
+    flex-direction: column;
+}
+
+.top-container-movements{
+    position: relative;
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.middle-container-movements{
+    position: relative;
+    width: 90%;
+    height: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10%;
+}
+
+.bottom-container-movements{
+    position: relative;
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.movement-title-container, .movement-level-container, .movement-categorie-container, .movement-type-container{
+    position: relative;
+    height: 100%;
+}
+
+.movement-title-container{
+    width: 48%;
+    display: flex;
+    align-items: center;
+    margin-left: 8.5%;
+}
+
+.movement-categorie-container, .movement-level-container, .movement-type-container{
+    width: 13%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.movement-name-text{
+    font-size: clamp(0.6rem, 1.4vw, 1.2rem);
+    color: red;
+    font-family: 'retro', sans-serif;
+    word-break: break-word;
+}
+
+.movement-name-text-level{
+    font-size: clamp(0.3rem, 1.2vw, 1.2rem);
+    color: red;
+    font-family: 'retro', sans-serif;
+    word-break: break-word;
+}
+
+.icono-ataques-tipo{
+    width: 70%;
+    aspect-ratio: 1/1;
+}
+
+.icono-ataques-categoria{
+    width: 90%;
+    height: 70%;
+}
+
+.movement-description-text{
+    font-size: clamp(0.6rem, 0.7vw, 0.8rem);
+    color: white;
+    font-family: 'retro', sans-serif;
+    word-break: break-word;
 }

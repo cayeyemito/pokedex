@@ -1,5 +1,5 @@
-CREATE VIEW pokemon_all_info AS    
-    WITH RECURSIVE PreEvolutionChain AS (
+CREATE VIEW pokemon_all_info AS       
+   WITH RECURSIVE PreEvolutionChain AS (
       SELECT 
         pe.id_pokemon AS pre_id,
         pe.id_evolucion AS final_id,
@@ -59,7 +59,7 @@ CREATE VIEW pokemon_all_info AS
             ON ec.current_id = pe.id_pokemon    
     ),
     todasHabilidades AS (
-        SELECT GROUP_CONCAT(h.id) AS habilidades, hp.id_pokemon
+        SELECT GROUP_CONCAT(h.id,"-",hp.oculta) AS habilidades, hp.id_pokemon
         FROM Habilidades h
         INNER JOIN Habilidades_Pokemon hp ON h.id = hp.id_habilidad
         GROUP BY hp.id_pokemon
@@ -94,16 +94,16 @@ CREATE VIEW pokemon_all_info AS
     )
     SELECT p.id AS numero_pokedex, p.nombre, p.descripcion, p.grito, p.imagen, p.peso, p.altura, p.hp, p.ataque_f, p.ataque_e, 
     p.defensa_f, p.defensa_e, p.velocidad, p.tipo, p.tipo_secundario, p.imagen_shiny, th.habilidades, mh.movHuevo,
-    mlu.movLevel, mt.movTutor, mm.movMaquina, GROUP_CONCAT(fe.id) AS formaEspecial, GROUP_CONCAT(fe.nombre), g.nombre_region,
+    mlu.movLevel, mt.movTutor, mm.movMaquina, GROUP_CONCAT(fe.id) AS formaEspecial, GROUP_CONCAT(fe.nombre) AS nombresFormaEspecial, g.nombre_region,
     ec.chain AS evolutions, prec.chain AS preevolutions
     FROM Pokemon p
-    INNER JOIN todasHabilidades th ON    th.id_pokemon = p.id
-    INNER JOIN movimientosHuevo mh ON mh.id_pokemon = p.id
-    INNER JOIN movimientosLevelUp mlu ON mlu.id_pokemon = p.id
-    INNER JOIN movimientosTutor mt ON mt.id_pokemon = p.id
-    INNER JOIN movimientosMaquina mm ON mm.id_pokemon = p.id
+    LEFT JOIN todasHabilidades th ON    th.id_pokemon = p.id
+    LEFT JOIN movimientosHuevo mh ON mh.id_pokemon = p.id
+    LEFT JOIN movimientosLevelUp mlu ON mlu.id_pokemon = p.id
+    LEFT JOIN movimientosTutor mt ON mt.id_pokemon = p.id
+    LEFT JOIN movimientosMaquina mm ON mm.id_pokemon = p.id
     LEFT JOIN FormasEspeciales fe ON fe.id_pokemon_original = p.id
-    INNER JOIN Generacion g ON p.generacion = g.id
+    LEFT JOIN Generacion g ON p.generacion = g.id
     LEFT JOIN EvolutionChain ec ON ec.original_id = p.id
     LEFT JOIN (
         SELECT 

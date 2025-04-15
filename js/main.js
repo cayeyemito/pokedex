@@ -21,7 +21,17 @@ let tipos = document.getElementById("tipos")
 let pokeWeight = document.getElementById("infoWeight")
 let tipo1 = document.getElementById("tipo1")
 let tipo2 = document.getElementById("tipo2")
+let tittleAbility = document.getElementById("tittleAbility")
+let abilityContainer = document.getElementById("abilityContainer")
 let chartInstance;
+let habilidades
+let movimientos = {
+    huevo: [],
+    nivel: [],
+    tutor: [],
+    maquina: []
+}
+let id = 1
 
 async function initialize(numberPokedex) {
 
@@ -31,7 +41,10 @@ async function initialize(numberPokedex) {
 
     pokemon = await getPokemonInfo(numberPokedex);
 
-    console.log(pokemon)
+    movimientos.nivel = await getAllMovements(1, pokemon.movLevel)
+    movimientos.huevo = await getAllMovements(0, pokemon.movHuevo)
+    movimientos.tutor = await getAllMovements(0, pokemon.movTutor)
+    movimientos.maquina = await getAllMovements(0, pokemon.movMaquina)
 
     innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
     innerScreen.style.backgroundImage = `url("img/tipos/${pokemon.tipo}/${pokemon.tipo}.jpg")`
@@ -51,9 +64,58 @@ async function initialize(numberPokedex) {
         document.getElementById("tipo2Container").style.display = 'none'
         tipo1.src = `img/iconos_tipos/Icon_${pokemon.tipo}.webp`;
     }
+    
 
-    const habilidades = await getAllAbilities()
-    console.log(habilidades)
+    habilidades = await getAllAbilities()
+    habilidades.sort((a, b) => a.oculta - b.oculta);
+    let count = 0
+
+    let existingDivs = document.querySelectorAll('.ability-text-container');
+    existingDivs.forEach(div => div.remove());
+    let existingDivs2 = document.querySelectorAll('.delete');
+    existingDivs2.forEach(div => div.remove());
+
+    for(let i=0; i<habilidades.length; i++){
+        if(habilidades[i].oculta == 0){
+            let div = document.createElement("div")
+            div.classList.add("ability-text-container")
+            div.innerHTML = `<h2 class="info-text">
+                                <span class="text-with-icon">
+                                    ${habilidades[i].nombre}
+                                    <span class="tooltip-container">
+                                    <img src="img/signo-de-interrogacion.png" class="iconito" alt="Info">
+                                    <span class="tooltip-text">${habilidades[i].descripcion}</span>
+                                    </span>
+                                </span>
+                            </h2>`
+            abilityContainer.appendChild(div)
+            count++
+        } else if(habilidades[i].oculta == 1){
+            let div = document.createElement("div")
+            div.classList.add("ability-text-tittle-container")
+            div.classList.add("delete")
+            div.innerHTML = `<h1 class="info-text-tittle line-ability">Oculta</h1>`;
+            abilityContainer.appendChild(div)
+            div = document.createElement("div")
+            div.classList.add("ability-text-container")
+            div.innerHTML = `<h2 class="info-text">
+                                <span class="text-with-icon">
+                                    ${habilidades[i].nombre}
+                                    <span class="tooltip-container">
+                                    <img src="img/signo-de-interrogacion.png" class="iconito" alt="Info">
+                                    <span class="tooltip-text">${habilidades[i].descripcion}</span>
+                                    </span>
+                                </span>
+                            </h2>`
+            abilityContainer.appendChild(div)
+        }
+    }
+
+    if(count>1){
+        tittleAbility.innerText = 'Habilidades'
+    } else {
+        tittleAbility.innerText = 'Habilidad'
+    }
 
     if (pokemon) {
         const pokemonStats = {
@@ -108,14 +170,14 @@ async function initialize(numberPokedex) {
                             family: 'retro',
                             size: 18
                         },
-                        color: '#fff'
+                        color: '#ff5b5b'
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            color: '#fff',
+                            color: '#ff5b5b',
                             font: {
                                 family: 'retro',
                                 size: 12
@@ -127,7 +189,7 @@ async function initialize(numberPokedex) {
                     },
                     x: {
                         ticks: {
-                            color: '#fff',
+                            color: '#ff5b5b',
                             font: {
                                 family: 'retro',
                                 size: 12
@@ -150,7 +212,12 @@ async function initialize(numberPokedex) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    initialize(1);
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); // Comienza a parpadear
+
+    initialize(id).finally(() => {
+        blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+    });
 });
 
 function showGuide(){
@@ -239,7 +306,7 @@ function passPreviousStat() {
         stat--
     } else if (stat === 3){
         statsScreen.style.visibility = "visible"
-        movementScreen.visibility = "hidden"
+        movementScreen.style.visibility = "hidden"
         stat2.style.transform = "scale(1.3)"
         stat3.style.transform = "scale(1)"
         stat--
@@ -273,12 +340,12 @@ function searchPokemonInput(number){
 
 function searchPokemon(){
     let numberToTry = document.getElementById("pokemon-name-text").innerText
-    let numeroPokedex = parseInt(numberToTry);
+    id = parseInt(numberToTry);
     
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
 
-    initialize(numeroPokedex).finally(() => {
+    initialize(id).finally(() => {
         blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
     });
 }
@@ -312,8 +379,58 @@ function turnOffScreen(){
     }
 }
 
+async function getAllMovements(num, movimientos){
+    let idsArray = []
+    if(num === 1){
+        idsArray = movimientos.split(",").map(par => {
+            let [id, nivel] = par.split("-").map(Number);
+            return [id, nivel];
+        });
+    } else {
+        idsArray = movimientos.split(",").map(Number);
+    }
+    let movimientosData = []
+
+    for (let i = 0; i < idsArray.length; i++) {
+        try {
+            const bodyData = new URLSearchParams();
+            bodyData.append('movimiento', idsArray[i]);
+    
+            const response = await fetch("../php/getThings.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: bodyData.toString()
+            });
+    
+            if (!response.ok) throw new Error("HTTP error " + response.status);
+    
+            const text = await response.text();
+            const data = JSON.parse(text);
+    
+            if (data.status === "success") {
+                let movimiento = data.data;
+                if(num === 1){
+                    movimiento.nivel = idsArray[i][1];
+                }
+                movimientosData.push(movimiento);
+            } else {
+                console.warn("No se encontró el Pokémon:", data.message);
+            }
+    
+        } catch (error) {
+            console.error("Error al obtener datos:", error);
+        }
+    }
+    return movimientosData
+}
+
 async function getAllAbilities(){
-    let habilidadesArray = pokemon.habilidades.split(",").map(Number);
+    let habilidadesArray = pokemon.habilidades.split(",").map(par => {
+        let [id, esOculta] = par.split("-").map(Number);
+        return [id, esOculta];
+    });
     let habilidadesData = []
 
     for (let i = 0; i < habilidadesArray.length; i++) {
@@ -335,7 +452,9 @@ async function getAllAbilities(){
             const data = JSON.parse(text);
     
             if (data.status === "success") {
-                habilidadesData.push(data.data);
+                let habilidad = data.data;
+                habilidad.oculta = habilidadesArray[i][1]; // añadís si es oculta
+                habilidadesData.push(habilidad);
             } else {
                 console.warn("No se encontró el Pokémon:", data.message);
             }
@@ -351,6 +470,10 @@ function animationEndHandler() {
     innerScreenOverlay.style.visibility = 'visible';
     pokemonScreenGlass.style.visibility = "visible" // Se activa después de la animación
     innerScreen.removeEventListener('animationend', animationEndHandler); // Limpiar el listener
+}
+
+function showDescription(num){
+    console.log(habilidades[num].descripcion)
 }
 
 async function getPokemonInfo(numeroPokedex) {
@@ -388,3 +511,89 @@ async function getPokemonInfo(numeroPokedex) {
         console.error("Error al obtener datos:", error);
     }
 }
+
+function reproSoundCry(){
+    const audio = new Audio(pokemon.grito);
+    audio.play().catch(error => {
+        console.error("Error al reproducir el grito:", error);
+    });
+}
+
+function nextPokemon(){
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); // Comienza a parpadear
+    if(id<1025){
+        id++
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+        });
+    } else{
+        id = 1
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+        });
+    }
+}
+
+function previousPokemon(){
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); // Comienza a parpadear
+    if(id>1){
+        id--
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+        });
+    } else{
+        id = 1025
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+        });
+    }
+}
+
+function showMovements(number){
+    movementScreen.innerHTML = ""
+}
+
+function checkLandscape() {
+    const warningDiv = document.querySelector("#orientation-warning");
+    const pokedexContent = document.querySelector("#pokedex-content"); // Asegúrate de tener un ID para el contenido de la Pokédex
+    
+    if (window.innerHeight > window.innerWidth) {
+        // Si está en orientación vertical (portrait), muestra el aviso y oculta el contenido
+        if (!warningDiv) {
+            const newWarningDiv = document.createElement("div");
+            newWarningDiv.id = "orientation-warning"; // ID único para poder encontrarlo fácilmente
+            newWarningDiv.style.textAlign = "center";
+            newWarningDiv.style.padding = "2rem";
+            newWarningDiv.style.fontFamily = "sans-serif";
+            newWarningDiv.innerHTML = `
+                <h2>Por favor gira tu dispositivo</h2>
+                <p>Esta app funciona mejor en orientación horizontal.</p>
+            `;
+            document.body.appendChild(newWarningDiv);
+        }
+
+        // Oculta el contenido de la Pokédex (o cualquier otro contenido relevante)
+        if (pokedexContent) {
+            pokedexContent.classList.add("hide-content");
+        }
+    } else {
+        // Si está en horizontal (landscape), elimina el aviso y muestra el contenido
+        if (warningDiv) {
+            warningDiv.remove();
+        }
+
+        // Muestra el contenido de la Pokédex
+        if (pokedexContent) {
+            pokedexContent.classList.remove("hide-content");
+        }
+    }
+}
+
+// Escucha los cambios de tamaño y de orientación
+window.addEventListener("resize", checkLandscape);
+window.addEventListener("orientationchange", checkLandscape);
+
+// Llama a la función al cargar la página para detectar la orientación inicial
+checkLandscape();

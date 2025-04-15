@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="main-wrapper">
+  <div class="main-wrapper" id="pokedex-content">
     <!-- El SVG se mantiene sin modificaciones -->
     <svg class="svg-border" viewBox="0 0 1086 720" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path id="contorno" fill-rule="evenodd" clip-rule="evenodd" d="M1030.1 175.5H879.8C860.2 175.5 856.9 164.4 856.9 153.3C856.9 127.6 830.3 105.1 803.3 105.1H597.3V37.4C597.2 13 583.6 0 560.1 0H64.1C27.3 0 0 15.3 0 57V668.4C0 696.9 25.5 720 55.4 720H1034.2C1058.1 720 1085.9 694.2 1085.9 670.3V230.8C1085.8 199.3 1063 175.5 1030.1 175.5ZM312.8 647.3C312.8 651.2 309.6 654.3 305.8 654.3H148.9C145 654.3 141.9 651.1 141.9 647.3V601.5C141.9 597.6 145.1 594.5 148.9 594.5H305.7C309.6 594.5 312.7 597.7 312.7 601.5V647.3H312.8ZM401.9 420.8C401.9 436.3 389.2 449 373.7 449H151C135.5 449 122.8 436.3 122.8 420.8V287.8C122.8 272.3 135.5 259.6 151 259.6H373.7C389.2 259.6 401.9 272.3 401.9 287.8V420.8V420.8ZM782 656.2C782 658.1 780.5 659.6 778.6 659.6H669.3C667.4 659.6 665.9 658.1 665.9 656.2V627C665.9 625.1 667.4 623.6 669.3 623.6H778.6C780.5 623.6 782 625.1 782 627V656.2V656.2ZM981.3 656.2C981.3 658.1 979.8 659.6 977.9 659.6H868.7C867.8 659.6 866.9 659.2 866.3 658.6C865.7 658 865.3 657.1 865.3 656.2V627C865.3 625.1 866.8 623.6 868.7 623.6H978C979.9 623.6 981.4 625.1 981.4 627V656.2H981.3ZM1012.7 357.2C1012.7 375 1004.9 386.2 977 386.2H672C644 386.2 634.3 375.1 634.3 357.2V256.2C634.3 238.4 644.4 228.8 672.4 228.8H975.9C1003.9 228.8 1012.7 238.3 1012.7 256.2V357.2Z" fill="#323232"/>
@@ -19,12 +19,11 @@
       <path id="middle-column" fill-rule="evenodd" clip-rule="evenodd" d="M564.8 101.5C569.5 102.4 574.1 103.6 578.6 105.1V35.9C578.6 24.6 577.4 19.8 564.8 18.6V101.5Z M556.9 18.2H549.2V99.5C554.4 99.8 559.5 100.4 564.7 101.5V18.6C562.5 18.3 559.9 18.2 556.9 18.2Z M549.2 18.2H537.3V99.5C541.3 99.3 545.2 99.3 549.2 99.5V18.2Z M537.3 18.2H521.8V101.4C527 100.4 532.1 99.8 537.3 99.5V18.2Z M521.8 18.2H507.8V105C512.4 103.5 517.1 102.3 521.8 101.4V18.2Z M578.5 123.3V228.9C573.9 227.1 569.3 225.6 564.7 224.5V118.9C569.4 120.1 574 121.5 578.5 123.3Z M521.8 118.9V224.2C526.9 222.9 532.1 222.2 537.3 221.8V116.6C532.1 116.9 527 117.7 521.8 118.9Z M549.2 116.6C554.4 116.9 559.6 117.7 564.7 119V224.5C559.5 223.2 554.3 222.4 549.2 222V116.6Z M537.3 116.6C541.3 116.3 545.3 116.3 549.2 116.6V222C545.2 221.7 541.2 221.7 537.3 221.9V116.6Z M564.8 243.1C569.4 244.2 574 245.7 578.6 247.5V488.4C574 486.6 569.4 485.1 564.8 484V243.1Z M549.2 240.8C554.4 241.1 559.6 241.9 564.7 243.2V484C559.5 482.7 554.3 481.9 549.2 481.5V240.8Z M537.3 240.7C541.3 240.4 545.3 240.4 549.2 240.7V481.4C545.2 481.1 541.2 481.1 537.3 481.3V240.7Z M521.8 243.1C527 241.9 532.2 241.1 537.3 240.8V481.4C532.1 481.7 526.9 482.5 521.8 483.8V243.1Z M564.8 501.5C569.4 502.6 574 504.1 578.6 505.9V611.5C574 609.7 569.4 608.2 564.8 607.1V501.5Z M549.2 499.1C554.4 499.4 559.6 500.2 564.7 501.5V607C559.5 605.7 554.3 604.9 549.2 604.5V499.1Z M537.3 499.1C541.3 498.8 545.3 498.8 549.2 499.1V604.5C545.2 604.2 541.2 604.2 537.3 604.4V499.1Z M521.8 501.4C527 500.2 532.2 499.4 537.3 499.1V604.4C532.1 604.7 526.9 605.5 521.8 606.8V501.4Z M564.8 624.7C569.4 625.8 574 627.3 578.6 629.1V702H564.8V624.7Z M549.2 622.3C554.4 622.6 559.6 623.4 564.7 624.7V702H549.2V622.3Z M537.3 622.3C541.3 622 545.3 622 549.2 622.3V702H537.3V622.3Z M521.8 624.6C527 623.4 532.2 622.6 537.3 622.3V702H521.8V624.6Z M507.7 228.9V123.3C512.4 121.5 517.1 120 521.7 118.9V224.2C517.1 225.3 512.4 226.9 507.7 228.9Z M507.7 488.4V247.5C512.4 245.7 517.1 244.2 521.7 243.1V483.8C517.1 484.9 512.4 486.5 507.7 488.4Z M507.7 701.9V629C512.4 627.2 517.1 625.7 521.7 624.6V701.9H507.7Z M507.7 611.4V505.8C512.4 504 517.1 502.5 521.7 501.4V606.7C517.1 607.9 512.4 609.4 507.7 611.4Z" fill="#DE3D2B"/>
       <path id="_317978344" fill-rule="evenodd" clip-rule="evenodd" d="M489.4 29.7V18.2H63.3C30.1 18.2 18.2 37.3 18.2 57.2V188.6C22 185.9 25.2 183.9 29 182.4V71C29 36.7 31.8 29.6 66.9 29.6H489.4V29.7Z" fill="#F1ABA4"/>
     </svg>
-    <div class="container">
+    <div class="container" id="pokedex-content">
         <div class="left_container">
             <div class="top-left">
                 <div class="blue-button-container">
                     <div class="blue-button">
-
                     </div>
                 </div>
                 <div class="empty">
@@ -182,39 +181,87 @@
                     <div class="info-screen-container">
                         <div class="pokemon-info-container" id="infoScreen">
                             <div class="basic-info-container">
-                                <div class="tittle-container">
-                                    <h1 class="info-text-tittle margin-top">Altura</h1>
-                                </div>
-                                <div class="text-container">
-                                    <h2 class="info-text" id="infoHeight"></h2>
-                                </div>
-                                <div class="tittle-container">
-                                    <h1 class="info-text-tittle margin-top">Peso</h1>
-                                </div>
-                                <div class="text-container">
-                                    <h2 class="info-text" id="infoWeight"></h2>
-                                </div>
-                                <div class="tittle-container">
-                                    <h1 class="info-text-tittle margin-top" id="tipos"></h1>
-                                </div>
-                                <div class="text-container">
-                                    <div class="tipo-container">
-                                        <img src="" id="tipo1" class="littleIconTipo" alt="">
+                                <div class="info">
+                                    <div class="tittle-container">
+                                        <div class="tittle">
+                                            <h1 class="info-text-tittle line-ability">Altura</h1>
+                                        </div>
+                                        <div class="empty"></div>
+                                        <div class="tittle">
+                                            <h1 class="info-text-tittle line-ability">Peso</h1>
+                                        </div>
                                     </div>
-                                    <div class="empty-icon" id="empty"></div>
-                                    <div class="tipo-container" id="tipo2Container">
-                                        <img src="" id="tipo2" class="littleIconTipo" alt="">
+                                    <div class="text-container">
+                                        <div class="text">
+                                            <h2 class="info-text" id="infoHeight"></h2>
+                                        </div>
+                                        <div class="empty"></div>
+                                        <div class="text">
+                                            <h2 class="info-text" id="infoWeight"></h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tipo">
+                                    <div class="tittle-container">
+                                        <h1 class="info-text-tittle line-ability" id="tipos"></h1>
+                                    </div>
+                                    <div class="text-container">
+                                        <div class="tipo-container">
+                                            <img src="img/iconos_tipos/Icon_grass.webp" id="tipo1" class="littleIconTipo" alt="">
+                                        </div>
+                                        <div class="empty-icon" id="empty"></div>
+                                        <div class="tipo-container" id="tipo2Container">
+                                            <img src="img/iconos_tipos/Icon_poison.webp" id="tipo2" class="littleIconTipo" alt="">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="ability-container">
-
+                                <div class="tittle-container ability margin-top" id="abilityContainer">
+                                    <div class="ability-text-tittle-container">
+                                        <h1 class="info-text-tittle line-ability" id="tittleAbility"></h1>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="pokemon-stats-chart-container" id="statScreen">
                             <canvas id="pokemonStatsChart" class="pokemon-stat-graphic"></canvas>
                         </div>
-                        <div class="pokemon-movements-container" id="movementScreen">
+                        <div class="pokemon-movements-container flex-direction" id="movementScreen">
+                            <!--<div class="level-movements">
+                                <img src="img/levelup.png" class="icono-movimientos" onclick="showMovements('nivel')">
+                            </div>
+                            <div class="egg-movements">
+                                <img src="img/huevo-de-pascua.png" class="icono-movimientos">
+                            </div>
+                            <div class="machine-movements">
+                                <img src="img/computadora.png" class="icono-movimientos white">
+                            </div>
+                            <div class="tutor-movements">
+                                <img src="img/profesor.png" class="icono-movimientos">
+                            </div>-->
+                            <div class="top-container-movements">
+                                <div class="movement-title-container">
+                                    <h1 class="movement-name-text line-ability">Placaje</h1>
+                                </div>
+                                <div class="movement-level-container">
+                                    <h1 class="movement-name-text-level">Lv15</h1>
+                                </div>
+                                <div class="movement-type-container">
+                                    <img src="img/iconos_tipos/Icon_normal.webp" class="icono-ataques-tipo">
+                                </div>
+                                <div class="movement-categorie-container">
+                                    <img src="img/categorias/fisico.png" class="icono-ataques-categoria">
+                                </div>
+                            </div>
+                            <div class="middle-container-movements">
+                                <h1 class="movement-description-text">Se lanza hacia adelante e inflige daño a los Pokémon rivales que se encuentran en su trayectoria, además de incapacitarlos temporalmente.</h1>
+                            </div>
+                            <div class="bottom-container-movements">
+
+                            </div>
+                        </div>
+                        <div class="pokemon-evolution-container">
 
                         </div>
                     </div>
@@ -332,7 +379,25 @@
                 </div>
             </div>
             <div class="bottom-right-buttons-container">
+                <div class="top-right-buttons-container">
+                    <div class="pad-pokemon-container">
+                        <div class="left-pad">
+                            <img src="img/izquierda.png" class="arrow-icon" onclick="previousPokemon()">
+                        </div>
+                        <div class="right-pad">
+                            <img src="img/derecha.png" class="arrow-icon" onclick="nextPokemon()">
+                        </div>
+                    </div>
+                    <div class="cry-button-container">
+                        <div class="cry-button" onclick="reproSoundCry()">
+                            <img src="img/volumen.png" class="littleIconCry">
+                        </div>
+                        <div class="guide-button2"></div>
+                    </div>
+                </div>
+                <div class="bottom-right-things-container">
 
+                </div>
             </div>
         </div>
     </div>
