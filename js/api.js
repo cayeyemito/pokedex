@@ -19,17 +19,16 @@ async function fetchAbility(id) {
     const [responsePromise] = await Promise.all([response]);
     
     const data = await responsePromise.json();
+    const peso = data.weight/10
+    const altura = data.height/10
 
-    const urlParts = data.species.url.split('/').filter(Boolean);
-    const generacionId = parseInt(urlParts[urlParts.length - 1]);
-
-    const pokeImage = data.sprites.other.showdown.front_shiny || data.sprites.other["official-artwork"].front_shiny;
+    console.log(peso, altura)
 
     // Crear un nuevo objeto 'ability' para evitar sobrescritura
     const ability = {
         id: data.id,
-        pokemon_id_original: generacionId,
-        imagen_shiny: pokeImage,
+        peso: peso,
+        altura: altura
     };
 
     return ability; // Devuelve el objeto con los datos de la habilidad
