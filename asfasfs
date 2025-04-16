@@ -1,5 +1,4 @@
-CREATE VIEW pokemon_all_info AS       
-   WITH RECURSIVE PreEvolutionChain AS (
+WITH RECURSIVE PreEvolutionChain AS (
       SELECT 
         pe.id_pokemon AS pre_id,
         pe.id_evolucion AS final_id,
@@ -32,7 +31,7 @@ CREATE VIEW pokemon_all_info AS
         SELECT 
             pe.id_pokemon AS original_id,
             pe.id_pokemon AS current_id,
-            CAST(pe.id AS CHAR(1000)) AS chain,
+            CAST(pe.id_pokemon AS CHAR(1000)) AS chain,
             0 AS step
         FROM Pokemon_Evolucion pe
         WHERE pe.id_evolucion IS NOT NULL
@@ -93,7 +92,7 @@ CREATE VIEW pokemon_all_info AS
         GROUP BY mp.id_pokemon
     )
     SELECT p.id AS numero_pokedex, p.nombre, p.descripcion, p.grito, p.imagen, p.peso, p.altura, p.hp, p.ataque_f, p.ataque_e, 
-    p.defensa_f, p.defensa_e, p.velocidad, p.tipo, p.tipo_secundario, p.imagen_shiny, th.habilidades, mh.movHuevo,
+    p.defensa_f, p.defensa_e, p.velocidad, p.tipo, p.tipo_secundario, p.imagen_shiny, th.habilidades, mh.movHuevo, p.genero,
     mlu.movLevel, mt.movTutor, mm.movMaquina, GROUP_CONCAT(fe.id) AS formaEspecial, GROUP_CONCAT(fe.nombre) AS nombresFormaEspecial, g.nombre_region,
     ec.chain AS evolutions, prec.chain AS preevolutions
     FROM Pokemon p
@@ -104,27 +103,63 @@ CREATE VIEW pokemon_all_info AS
     LEFT JOIN movimientosMaquina mm ON mm.id_pokemon = p.id
     LEFT JOIN FormasEspeciales fe ON fe.id_pokemon_original = p.id
     LEFT JOIN Generacion g ON p.generacion = g.id
-    LEFT JOIN EvolutionChain ec ON ec.original_id = p.id
     LEFT JOIN (
-        SELECT 
-            original_id, 
-            MAX(step) - 1 AS max_step -- Obtenemos el penúltimo paso
+        SELECT original_id, chain
         FROM EvolutionChain
-        GROUP BY original_id
-    ) max_ec 
-        ON ec.original_id = max_ec.original_id 
-        AND ec.step = max_ec.max_step
+        WHERE (original_id, step) IN (
+            SELECT original_id, MAX(step)
+            FROM EvolutionChain
+            GROUP BY original_id
+        )
+    ) ec ON ec.original_id = p.id
     LEFT JOIN (
-      SELECT 
-          prec.final_id,
-          prec.pre_id,
-          prec.chain,
-          prec.step
-      FROM PreEvolutionChain prec
-      INNER JOIN (
-          SELECT final_id, MAX(step) AS max_step
-          FROM PreEvolutionChain
-          GROUP BY final_id
-      ) precmax ON prec.final_id = precmax.final_id AND prec.step = precmax.max_step
+        SELECT final_id, chain
+        FROM PreEvolutionChain
+        WHERE (final_id, step) IN (
+            SELECT final_id, MAX(step)
+            FROM PreEvolutionChain
+            GROUP BY final_id
+        )
     ) prec ON prec.final_id = p.id
     GROUP BY p.id
+
+
+WITH RECURSIVE PreEvolutionChain AS (
+      SELECT 
+        pe.id_pokemon AS pre_id,
+        pe.id_evolucion AS final_id,
+        CAST(
+          CONCAT(
+            pe.id_pokemon, '<-', pe.metodo,
+            IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+            IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+            '<-', pe.id_evolucion
+          ) AS CHAR(1000)
+        ) AS chain,
+        0 AS step
+      FROM Pokemon_Evolucion pe
+      WHERE pe.id_evolucion IS NOT NULL
+      UNION ALL
+      SELECT
+        pe.id_pokemon AS pre_id,
+        rec.final_id,
+        CONCAT(
+          pe.id_pokemon, '<-', pe.metodo,
+          IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+          IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+          '<-', rec.chain
+        ) AS chain,
+        rec.step + 1
+      FROM PreEvolutionChain rec
+      INNER JOIN Pokemon_Evolucion pe ON pe.id_evolucion = rec.pre_id
+   )
+SELECT 
+  p.final_id AS final_evolution,
+  p.chain
+FROM PreEvolutionChain p
+WHERE p.step = (
+  SELECT MAX(p2.step)
+  FROM PreEvolutionChain p2
+  WHERE p2.final_id = p.final_id
+)
+ORDER BY p.final_id;

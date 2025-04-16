@@ -16,22 +16,25 @@ let innerScreen = document.getElementById("inner-screen")
 let innerScreenOverlay = document.getElementById("inner-screen-overlay")
 let pokeNameIdText = document.getElementById("pokemon-name-text")
 let pokemonScreenGlass = document.getElementById("inner-screen-overlay-glass")
-let pokeHeight = document.getElementById("infoHeight")
-let tipos = document.getElementById("tipos")
-let pokeWeight = document.getElementById("infoWeight")
-let tipo1 = document.getElementById("tipo1")
-let tipo2 = document.getElementById("tipo2")
-let tittleAbility = document.getElementById("tittleAbility")
 let abilityContainer = document.getElementById("abilityContainer")
+let basicInfoContainer = document.getElementById("basicInfo")
 let chartInstance;
 let habilidades
 let movimientos = {
     huevo: [],
-    nivel: [],
+    level: [],
     tutor: [],
     maquina: []
 }
 let id = 1
+let idMovimiento = 0
+let idMovimientoTipo
+let isChanged = false
+let formasArray = [];
+let formsScreen = document.getElementById("formsIcons")
+let pokemonOriginal
+let pokemonEspecialForm = false
+let isMega = true
 
 async function initialize(numberPokedex) {
 
@@ -39,83 +42,55 @@ async function initialize(numberPokedex) {
         chartInstance.destroy();
     }
 
-    pokemon = await getPokemonInfo(numberPokedex);
+    if(!pokemonEspecialForm){
+        pokemon = await getPokemonInfo(numberPokedex);
+        getForms()
+    } else {
+        pokemon = await getSpecialPokemonInfo(numberPokedex);
+        Object.assign(pokemon, {
+            genero: pokemonOriginal.genero,
+            descripcion: pokemonOriginal.descripcion,
+            nombre_region: pokemonOriginal.nombre_region
+        })
+        pokemonEspecialForm = false
+        formsScreen.innerHTML =`<div class="mega-evolution-container">
+                                    <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="megaEvolution(${id})">
+                                </div>`
+    }
 
-    movimientos.nivel = await getAllMovements(1, pokemon.movLevel)
-    movimientos.huevo = await getAllMovements(0, pokemon.movHuevo)
-    movimientos.tutor = await getAllMovements(0, pokemon.movTutor)
-    movimientos.maquina = await getAllMovements(0, pokemon.movMaquina)
-
+    const tiposMovimiento = [
+        { tipo: 'level', id: 1, icono: 'levelup.png' },
+        { tipo: 'huevo', id: 2, icono: 'huevo-de-pascua.png' },
+        { tipo: 'maquina', id: 3, icono: 'computadora.png', extraClass: 'white' },
+        { tipo: 'tutor', id: 4, icono: 'profesor.png' }
+    ];
+    
+    tiposMovimiento.forEach(({ tipo, id, icono, extraClass = '' }) => {
+        // Usamos la notación dinámica para obtener el atributo correcto
+        const movKey = `mov${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`; 
+    
+        const data = pokemon[movKey]; 
+        const element = document.getElementById(tipo);
+    
+        if (data != null) {
+            element.style.display = 'flex';
+            element.innerHTML = `
+                <img src="img/${icono}" class="icono-movimientos ${extraClass}" onclick="showMovements(${id})">
+            `;
+            movimientos[tipo] = getAllMovements(id, data); // sin await
+        } else {
+            element.style.display = 'none';
+        }
+    });
+    
+    createBasicInfo()
+    
     innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
     innerScreen.style.backgroundImage = `url("img/tipos/${pokemon.tipo}/${pokemon.tipo}.jpg")`
-    pokeNameIdText.innerText = `${pokemon.nombre}`
-    pokeHeight.innerText = `${pokemon.altura} m`
-    pokeWeight.innerText = `${pokemon.peso} kg`
-
-    if(pokemon.tipo_secundario){
-        tipos.innerText = 'Tipos'
-        document.getElementById("empty").style.display = 'flex'
-        document.getElementById("tipo2Container").style.display = 'flex'
-        tipo1.src = `img/iconos_tipos/Icon_${pokemon.tipo}.webp`;
-        tipo2.src = `img/iconos_tipos/Icon_${pokemon.tipo_secundario}.webp`;
-    } else {
-        tipos.innerText = 'Tipo'
-        document.getElementById("empty").style.display = 'none'
-        document.getElementById("tipo2Container").style.display = 'none'
-        tipo1.src = `img/iconos_tipos/Icon_${pokemon.tipo}.webp`;
-    }
-    
+    pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`    
 
     habilidades = await getAllAbilities()
     habilidades.sort((a, b) => a.oculta - b.oculta);
-    let count = 0
-
-    let existingDivs = document.querySelectorAll('.ability-text-container');
-    existingDivs.forEach(div => div.remove());
-    let existingDivs2 = document.querySelectorAll('.delete');
-    existingDivs2.forEach(div => div.remove());
-
-    for(let i=0; i<habilidades.length; i++){
-        if(habilidades[i].oculta == 0){
-            let div = document.createElement("div")
-            div.classList.add("ability-text-container")
-            div.innerHTML = `<h2 class="info-text">
-                                <span class="text-with-icon">
-                                    ${habilidades[i].nombre}
-                                    <span class="tooltip-container">
-                                    <img src="img/signo-de-interrogacion.png" class="iconito" alt="Info">
-                                    <span class="tooltip-text">${habilidades[i].descripcion}</span>
-                                    </span>
-                                </span>
-                            </h2>`
-            abilityContainer.appendChild(div)
-            count++
-        } else if(habilidades[i].oculta == 1){
-            let div = document.createElement("div")
-            div.classList.add("ability-text-tittle-container")
-            div.classList.add("delete")
-            div.innerHTML = `<h1 class="info-text-tittle line-ability">Oculta</h1>`;
-            abilityContainer.appendChild(div)
-            div = document.createElement("div")
-            div.classList.add("ability-text-container")
-            div.innerHTML = `<h2 class="info-text">
-                                <span class="text-with-icon">
-                                    ${habilidades[i].nombre}
-                                    <span class="tooltip-container">
-                                    <img src="img/signo-de-interrogacion.png" class="iconito" alt="Info">
-                                    <span class="tooltip-text">${habilidades[i].descripcion}</span>
-                                    </span>
-                                </span>
-                            </h2>`
-            abilityContainer.appendChild(div)
-        }
-    }
-
-    if(count>1){
-        tittleAbility.innerText = 'Habilidades'
-    } else {
-        tittleAbility.innerText = 'Habilidad'
-    }
 
     if (pokemon) {
         const pokemonStats = {
@@ -202,7 +177,6 @@ async function initialize(numberPokedex) {
                 }
             }
         };
-        
 
         const ctx = document.getElementById('pokemonStatsChart').getContext('2d');
         chartInstance = new Chart(ctx, config);  // Crear la nueva instancia del gráfico
@@ -212,6 +186,13 @@ async function initialize(numberPokedex) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    // Escucha los cambios de tamaño y de orientación
+    window.addEventListener("resize", checkLandscape);
+    window.addEventListener("orientationchange", checkLandscape);
+
+    // Llama a la función al cargar la página para detectar la orientación inicial
+    checkLandscape();
+
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
 
@@ -367,7 +348,6 @@ function turnOffScreen(){
         innerScreen.classList.add("screen-off")
         innerScreen.classList.remove("screen-on")
         innerScreenOverlay.style.visibility = "hidden"
-        console.log()
         pokemonScreenGlass.style.visibility = "hidden"
         isOn = false
     } else {
@@ -412,7 +392,7 @@ async function getAllMovements(num, movimientos){
             if (data.status === "success") {
                 let movimiento = data.data;
                 if(num === 1){
-                    movimiento.nivel = idsArray[i][1];
+                    movimiento.level = idsArray[i][1];
                 }
                 movimientosData.push(movimiento);
             } else {
@@ -472,10 +452,6 @@ function animationEndHandler() {
     innerScreen.removeEventListener('animationend', animationEndHandler); // Limpiar el listener
 }
 
-function showDescription(num){
-    console.log(habilidades[num].descripcion)
-}
-
 async function getPokemonInfo(numeroPokedex) {
     try {
         // Crea el cuerpo de la solicitud con el número de Pokémon  // Aquí deberías pasar el número que deseas buscar
@@ -512,6 +488,42 @@ async function getPokemonInfo(numeroPokedex) {
     }
 }
 
+async function getSpecialPokemonInfo(numeroPokedex) {
+    try {
+        // Crea el cuerpo de la solicitud con el número de Pokémon  // Aquí deberías pasar el número que deseas buscar
+        const bodyData = new URLSearchParams();
+        bodyData.append('numero', numeroPokedex);
+      
+        // Realiza la solicitud POST
+        const response = await fetch("../php/getEspecialPokemon.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: bodyData.toString()  // Convierte el cuerpo de los parámetros en un string
+        });
+    
+        // Verifica si la respuesta es exitosa
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+    
+        // Obtiene la respuesta como texto
+        const text = await response.text();
+    
+        // Intenta parsear la respuesta JSON
+        let data = JSON.parse(text);
+    
+        // Verifica si la respuesta es correcta
+        if (data.status === "success") {
+            return data.data
+        } else {
+            console.warn("No se encontró el Pokémon:", data.message);
+        }
+      
+    } catch (error) {
+        console.error("Error al obtener datos:", error);
+    }
+}
+
 function reproSoundCry(){
     const audio = new Audio(pokemon.grito);
     audio.play().catch(error => {
@@ -520,6 +532,7 @@ function reproSoundCry(){
 }
 
 function nextPokemon(){
+    showMovementsOptions(1)
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
     if(id<1025){
@@ -536,6 +549,7 @@ function nextPokemon(){
 }
 
 function previousPokemon(){
+    showMovementsOptions(1)
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
     if(id>1){
@@ -551,8 +565,310 @@ function previousPokemon(){
     }
 }
 
-function showMovements(number){
+async function passNextAttack() {
+    if (stat === 3 && isChanged === true) {
+        const tipoMap = {
+            1: 'level',
+            2: 'huevo',
+            3: 'maquina',
+            4: 'tutor'
+        };
+
+        const tipoClave = tipoMap[idMovimientoTipo];
+
+        // Si aún es una promesa (porque se está cargando), esperamos a que termine
+        if (movimientos[tipoClave] instanceof Promise) {
+            movimientos[tipoClave] = await movimientos[tipoClave];
+        }
+
+        const movimientosTipo = movimientos[tipoClave];
+        if (!movimientosTipo || movimientosTipo.length === 0) return;
+
+        idMovimiento = (idMovimiento === movimientosTipo.length - 1)
+            ? 0
+            : idMovimiento + 1;
+
+        showMovements(idMovimientoTipo);
+    }
+}
+
+
+async function passPreviousAttack() {
+    if (stat === 3 && isChanged === true) {
+        const tipoMap = {
+            1: 'level',
+            2: 'huevo',
+            3: 'maquina',
+            4: 'tutor'
+        };
+
+        const tipoClave = tipoMap[idMovimientoTipo];
+        if (movimientos[tipoClave] instanceof Promise) {
+            movimientos[tipoClave] = await movimientos[tipoClave];
+        }
+
+        const movimientosTipo = movimientos[tipoClave];
+
+        if (!movimientosTipo || movimientosTipo.length === 0) return;
+
+        idMovimiento = (idMovimiento === 0)
+            ? movimientosTipo.length - 1
+            : idMovimiento - 1;
+
+        showMovements(idMovimientoTipo);
+    }
+}
+
+async function showMovements(num){
+    isChanged = true;
+    idMovimientoTipo = num;
+
+    let arrayMoves;
+    let level = "";
+
+    // Esperar si la promesa aún no se ha resuelto
+    switch (num) {
+        case 1:
+            arrayMoves = await movimientos.level;
+            level = `Lv${arrayMoves[idMovimiento]?.level ?? "-"}`;
+            break;
+        case 2:
+            arrayMoves = await movimientos.huevo;
+            break;
+        case 3:
+            arrayMoves = await movimientos.maquina;
+            break;
+        case 4:
+            arrayMoves = await movimientos.tutor;
+            break;
+        default:
+            arrayMoves = [];
+    }
+
+    const movimiento = arrayMoves[idMovimiento] || {};
+
+    const pot = movimiento.potencia ?? "-";
+    const pp = movimiento.pp ?? "-";
+    const pre = movimiento.precision_ataque ?? "-";
+
+
     movementScreen.innerHTML = ""
+    movementScreen.classList.add('flex-direction')
+    movementScreen.innerHTML = `<div class="top-container-movements">
+                                    <div class="movement-title-container">
+                                        <h1 class="movement-name-text line-ability">${arrayMoves[idMovimiento].nombre}</h1>
+                                    </div>
+                                    <div class="movement-level-container">
+                                        <h1 class="movement-name-text-level">${level}</h1>
+                                    </div>
+                                    <div class="movement-type-container">
+                                        <img src="img/iconos_tipos/Icon_${arrayMoves[idMovimiento].tipo}.webp" class="icono-ataques-tipo">
+                                    </div>
+                                    <div class="movement-categorie-container">
+                                        <img src="img/categorias/${arrayMoves[idMovimiento].categoria}.png" class="icono-ataques-categoria">
+                                    </div>
+                                </div>
+                                <div class="middle-container-movements">
+                                    <h1 class="movement-description-text">${arrayMoves[idMovimiento].descripcion}</h1>
+                                </div>
+                                <div class="bottom-container-movements">
+                                    <div class="potency-container">
+                                        <h1 class="potency">Potencia: <br></h1>
+                                        <h1 class="valor">${pot}</h1>
+                                    </div>
+                                    <div class="precision-container">
+                                        <h1 class="precision">Precision: <br></h1>
+                                        <h1 class="valor">${pre}</h1>
+                                    </div>
+                                    <div class="pp-container">
+                                        <h1 class="pp">PP: <br></h1>
+                                        <h1 class="valor">${pp}</h1>
+                                    </div>
+                                    <div class="back-container">
+                                        <img src="img/cerrar.png" class="icono-cruz" onclick="showMovementsOptions(0)")>
+                                    </div>
+                                </div>`
+}
+
+function showMovementsOptions(numeroOption){
+    isChanged = false
+    idMovimiento = 0
+    movementScreen.innerHTML = ""
+    movementScreen.classList.remove('flex-direction')
+    let linea1 = ""
+    let linea2 = ""
+    let linea3 = ""
+    let linea4 = ""
+    if(numeroOption === 0){
+        linea1 = `<img src="img/levelup.png" class="icono-movimientos" onclick="showMovements(1)">`
+        linea2 = `<img src="img/huevo-de-pascua.png" class="icono-movimientos" onclick="showMovements(2)">`
+        linea3 = `<img src="img/computadora.png" class="icono-movimientos white" onclick="showMovements(3)">`
+        linea4 = `<img src="img/profesor.png" class="icono-movimientos" onclick="showMovements(4)">`
+    }
+    movementScreen.innerHTML = `<div class="level-movements" id="level">
+                                    ${linea1}
+                                </div>
+                                <div class="egg-movements" id="huevo">
+                                    ${linea2}
+                                </div>
+                                <div class="machine-movements" id="maquina">
+                                    ${linea3}
+                                </div>
+                                <div class="tutor-movements" id="tutor">
+                                    ${linea4}
+                                </div>`
+}
+
+function createBasicInfo(){
+
+    if(pokemon.tipo_secundario != null){
+        tipo2 = `<div class="movement-categorie-container">
+                    <img src="img/iconos_tipos/Icon_${pokemon.tipo_secundario}.webp" class="icono-ataques-tipo">
+                </div>`;
+        widht = "bigWidht"
+    } else {
+        tipo2 = ""
+        widht = "biggerWidht"
+    }
+
+    function getGenderHTML(genderRate) {
+        const genderMap = {
+            "-1": [],
+            "0": [{ img: "hombre.png", class: "h-container", percent: "100%" }],
+            "1": [
+                { img: "hombre.png", class: "h-container", percent: "87.5%" },
+                { img: "mujer.png", class: "m-container", percent: "12.5%" }
+            ],
+            "2": [
+                { img: "hombre.png", class: "h-container", percent: "75%" },
+                { img: "mujer.png", class: "m-container", percent: "25%" }
+            ],
+            "3": [
+                { img: "hombre.png", class: "h-container", percent: "62.5%" },
+                { img: "mujer.png", class: "m-container", percent: "37.5%" }
+            ],
+            "4": [
+                { img: "hombre.png", class: "h-container", percent: "50%" },
+                { img: "mujer.png", class: "m-container", percent: "50%" }
+            ],
+            "5": [
+                { img: "hombre.png", class: "h-container", percent: "37.5%" },
+                { img: "mujer.png", class: "m-container", percent: "62.5%" }
+            ],
+            "6": [
+                { img: "hombre.png", class: "h-container", percent: "25%" },
+                { img: "mujer.png", class: "m-container", percent: "75%" }
+            ],
+            "7": [
+                { img: "hombre.png", class: "h-container", percent: "12.5%" },
+                { img: "mujer.png", class: "m-container", percent: "87.5%" }
+            ],
+            "8": [{ img: "mujer.png", class: "m-container", percent: "100%" }]
+        };
+      
+        const genderInfo = genderMap[genderRate];
+      
+        if (!genderInfo) return "Valor desconocido";
+      
+        if (genderInfo.length === 0) return ""; // Caso sin género
+      
+        return genderInfo
+        .map(
+            (g) => `
+            <div class="genero-container">
+                <div class="${g.class}">
+                    <img src="img/${g.img}" class="icono-genero">
+                    <h1 class="valor2">${g.percent}</h1>
+                </div>
+            </div>`
+        )
+        .join("");
+    }
+      
+      // Ejemplo de uso:
+    const description = getGenderHTML(pokemon.genero);      
+
+    basicInfoContainer.innerHTML = `<div class="top-container-movements">
+                                        <div class="movement-title-container ${widht}">
+                                            <h1 class="movement-name-text line-ability">${pokemon.nombre}</h1>
+                                        </div>
+                                        <div class="movement-type-container">
+                                            <img src="img/iconos_tipos/Icon_${pokemon.tipo}.webp" class="icono-ataques-tipo">
+                                        </div>
+                                        ${tipo2}
+                                    </div>
+                                    <div class="middle-container-movements">
+                                        <h1 class="movement-description-text">${pokemon.descripcion}</h1>
+                                    </div>
+                                    <div class="bottom-container-movements">
+                                        <div class="potency-container">
+                                            <h1 class="potency">Peso <br></h1>
+                                            <h1 class="valor">${pokemon.peso} kg</h1>
+                                        </div>
+                                        <div class="precision-container">
+                                            <h1 class="precision">Altura <br></h1>
+                                            <h1 class="valor">${pokemon.altura} m</h1>
+                                        </div>
+                                        ${description}
+                                    </div>`
+}
+
+function getForms(){
+    if(pokemon.formaEspecial != null){
+        let formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(String);
+        let formasArrayId = pokemon.formaEspecial.split(",").map(String);
+        for(i = 0; i<formasArrayNombre.length; i++){
+            formasArray.push({id:formasArrayId[i], nombre:formasArrayNombre[i]})
+        }
+        for(i = 0; i<formasArray.length;i++){
+            if(formasArray[i].nombre.includes("mega") || pokemon.nombre.includes("mega")){
+                formsScreen.innerHTML =`<div class="mega-evolution-container">
+                                            <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="megaEvolution(${formasArray[i].id})">
+                                        </div>`
+            }
+        }
+    } else {
+        formsScreen.innerHTML = ""
+    }
+}
+
+async function megaEvolution(newId) {
+    let megaEvo = document.getElementById("megaEvoScreen");
+    let megaEvoAnim = document.getElementById("megaEvoAnim");
+    let megaCont = document.getElementById("megaContainer");
+
+    pokemonOriginal = pokemon;
+    pokemonEspecialForm = true;
+
+    // Determinar el ID final según si está mega o no
+    const finalId = isMega ? newId : id;
+    isMega = !isMega;
+
+    // Mostrar contenedor y activar clases
+    megaEvo.style.display = 'flex';
+    megaEvo.classList.add('active');
+
+    // Reiniciar animaciones quitando y reañadiendo clases
+    megaEvoAnim.classList.remove('mega-animation');
+    megaCont.classList.remove('animate-glow');
+
+    // Forzar reflow para que la animación vuelva a ejecutarse
+    void megaEvoAnim.offsetWidth;
+    void megaCont.offsetWidth;
+
+    // Reaplicar clases que activan la animación
+    megaEvoAnim.classList.add('mega-animation');
+    megaCont.classList.add('animate-glow');
+
+    // Esperar a que termine la animación UNA vez
+    megaEvoAnim.addEventListener("animationend", function () {
+        initialize(finalId).finally(() => {
+            megaEvo.classList.remove('active');
+            megaEvoAnim.classList.remove('mega-animation');
+            megaCont.classList.remove('animate-glow');
+            megaEvo.style.display = 'none';
+        });
+    }, { once: true });
 }
 
 function checkLandscape() {
@@ -590,10 +906,3 @@ function checkLandscape() {
         }
     }
 }
-
-// Escucha los cambios de tamaño y de orientación
-window.addEventListener("resize", checkLandscape);
-window.addEventListener("orientationchange", checkLandscape);
-
-// Llama a la función al cargar la página para detectar la orientación inicial
-checkLandscape();

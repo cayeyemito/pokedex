@@ -14,23 +14,22 @@ function delay(ms) {
 // Función para obtener una habilidad
 async function fetchAbility(id) {
   try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`);
+   
+    const speciesPromise = fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}/`);
 
-    const [responsePromise] = await Promise.all([response]);
+    const [speciesResponse] = await Promise.all([speciesPromise]);
     
-    const data = await responsePromise.json();
-    const peso = data.weight/10
-    const altura = data.height/10
+    const speciesData = await speciesResponse.json();
 
-    console.log(peso, altura)
 
     // Crear un nuevo objeto 'ability' para evitar sobrescritura
     const ability = {
-        id: data.id,
-        peso: peso,
-        altura: altura
+      id: id,
+      genero: speciesData.gender_rate,
     };
 
+    console.log(ability)
+    
     return ability; // Devuelve el objeto con los datos de la habilidad
   } catch (error) {
     console.error(`Error al obtener habilidad para la ID ${id}:`, error);
@@ -81,7 +80,7 @@ async function fetchAbilitiesInBatches() {
     await sendAbilitiesToServer();
 
     // Esperar 1 segundo entre lotes para evitar sobrecarga
-    await delay(1000);
+    await delay(500);
   }
 
   console.log("Todas las habilidades han sido procesadas.");

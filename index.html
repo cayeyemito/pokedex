@@ -69,6 +69,11 @@
                             </div>
                             <div class="inner-screen-overlay" id="inner-screen-overlay">
                             </div>
+                            <div class="mega-evolution-screen" id="megaEvoScreen">
+                                <div class="mega-animation-container" id="megaContainer">
+                                    <img src="img/animacion-mega.png" class="mega-evolution-icon-anim" id="megaEvoAnim">
+                                </div>
+                            </div>
                             <div class="inner-screen-overlay-glass" id="inner-screen-overlay-glass">
                             </div>
                             <div class="guide-screen" id="guide-screen">
@@ -152,7 +157,7 @@
                     <div class="right-row">
                         <div class="dpad-top-container">
                             <div class="dpad-top">
-                                <div class="directional up"></div>
+                                <div class="directional up" onclick="passPreviousAttack()"></div>
                             </div>
                         </div>
                         <div class="dpad-middle-container">
@@ -168,7 +173,7 @@
                         </div>
                         <div class="dpad-bottom-container">
                             <div class="dpad-bottom">
-                                <div class="directional down"></div>
+                                <div class="directional down" onclick="passNextAttack()"></div>
                             </div>
                         </div>
                     </div>
@@ -180,8 +185,8 @@
                 <div class="right-inner-screen">
                     <div class="info-screen-container">
                         <div class="pokemon-info-container" id="infoScreen">
-                            <div class="basic-info-container">
-                                <div class="info">
+                            <div class="basic-info-container" id="basicInfo">
+                                <!-- <div class="info">
                                     <div class="tittle-container">
                                         <div class="tittle">
                                             <h1 class="info-text-tittle line-ability">Altura</h1>
@@ -214,51 +219,24 @@
                                             <img src="img/iconos_tipos/Icon_poison.webp" id="tipo2" class="littleIconTipo" alt="">
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="ability-container">
-                                <div class="tittle-container ability margin-top" id="abilityContainer">
-                                    <div class="ability-text-tittle-container">
-                                        <h1 class="info-text-tittle line-ability" id="tittleAbility"></h1>
-                                    </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <div class="pokemon-stats-chart-container" id="statScreen">
                             <canvas id="pokemonStatsChart" class="pokemon-stat-graphic"></canvas>
                         </div>
-                        <div class="pokemon-movements-container flex-direction" id="movementScreen">
-                            <!--<div class="level-movements">
-                                <img src="img/levelup.png" class="icono-movimientos" onclick="showMovements('nivel')">
+                        <div class="pokemon-movements-container" id="movementScreen">
+                            <div class="level-movements" id="level">
+                                <img src="img/levelup.png" class="icono-movimientos" onclick="showMovements(1)">
                             </div>
-                            <div class="egg-movements">
-                                <img src="img/huevo-de-pascua.png" class="icono-movimientos">
+                            <div class="egg-movements" id="huevo">
+                                <img src="img/huevo-de-pascua.png" class="icono-movimientos" onclick="showMovements(2)">
                             </div>
-                            <div class="machine-movements">
-                                <img src="img/computadora.png" class="icono-movimientos white">
+                            <div class="machine-movements" id="maquina">
+                                <img src="img/computadora.png" class="icono-movimientos white" onclick="showMovements(3)">
                             </div>
-                            <div class="tutor-movements">
-                                <img src="img/profesor.png" class="icono-movimientos">
-                            </div>-->
-                            <div class="top-container-movements">
-                                <div class="movement-title-container">
-                                    <h1 class="movement-name-text line-ability">Placaje</h1>
-                                </div>
-                                <div class="movement-level-container">
-                                    <h1 class="movement-name-text-level">Lv15</h1>
-                                </div>
-                                <div class="movement-type-container">
-                                    <img src="img/iconos_tipos/Icon_normal.webp" class="icono-ataques-tipo">
-                                </div>
-                                <div class="movement-categorie-container">
-                                    <img src="img/categorias/fisico.png" class="icono-ataques-categoria">
-                                </div>
-                            </div>
-                            <div class="middle-container-movements">
-                                <h1 class="movement-description-text">Se lanza hacia adelante e inflige daño a los Pokémon rivales que se encuentran en su trayectoria, además de incapacitarlos temporalmente.</h1>
-                            </div>
-                            <div class="bottom-container-movements">
-
+                            <div class="tutor-movements" id="tutor">
+                                <img src="img/profesor.png" class="icono-movimientos" onclick="showMovements(4)">
                             </div>
                         </div>
                         <div class="pokemon-evolution-container">
@@ -395,8 +373,7 @@
                         <div class="guide-button2"></div>
                     </div>
                 </div>
-                <div class="bottom-right-things-container">
-
+                <div class="bottom-right-things-container" id="formsIcons">
                 </div>
             </div>
         </div>
