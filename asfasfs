@@ -30,11 +30,15 @@ WITH RECURSIVE PreEvolutionChain AS (
     EvolutionChain AS (
         SELECT 
             pe.id_pokemon AS original_id,
-            pe.id_pokemon AS current_id,
-            CAST(pe.id_pokemon AS CHAR(1000)) AS chain,
+            pe.id_evolucion AS current_id,
+            CAST(CONCAT(
+                pe.id_pokemon, '->', pe.metodo,
+                IF(pe.nivel IS NOT NULL, CONCAT(' Nivel ', pe.nivel), ''),
+                IF(pe.condiccion_extra IS NOT NULL, CONCAT(' ', pe.condiccion_extra), ''),
+                '->', pe.id_evolucion
+            ) AS CHAR(1000)) AS chain,
             0 AS step
         FROM Pokemon_Evolucion pe
-        WHERE pe.id_evolucion IS NOT NULL
 
         UNION ALL
 
@@ -91,12 +95,12 @@ WITH RECURSIVE PreEvolutionChain AS (
         WHERE mp.metodo_aprendizaje = 'machine'
         GROUP BY mp.id_pokemon
     )
-    SELECT p.id AS numero_pokedex, p.nombre, p.descripcion, p.grito, p.imagen, p.peso, p.altura, p.hp, p.ataque_f, p.ataque_e, 
+    SELECT DISTINCT p.id AS numero_pokedex, p.nombre, p.descripcion, p.grito, p.imagen, p.peso, p.altura, p.hp, p.ataque_f, p.ataque_e, 
     p.defensa_f, p.defensa_e, p.velocidad, p.tipo, p.tipo_secundario, p.imagen_shiny, th.habilidades, mh.movHuevo, p.genero,
     mlu.movLevel, mt.movTutor, mm.movMaquina, GROUP_CONCAT(fe.id) AS formaEspecial, GROUP_CONCAT(fe.nombre) AS nombresFormaEspecial, g.nombre_region,
     ec.chain AS evolutions, prec.chain AS preevolutions
     FROM Pokemon p
-    LEFT JOIN todasHabilidades th ON    th.id_pokemon = p.id
+    LEFT JOIN todasHabilidades th ON th.id_pokemon = p.id
     LEFT JOIN movimientosHuevo mh ON mh.id_pokemon = p.id
     LEFT JOIN movimientosLevelUp mlu ON mlu.id_pokemon = p.id
     LEFT JOIN movimientosTutor mt ON mt.id_pokemon = p.id
@@ -104,13 +108,9 @@ WITH RECURSIVE PreEvolutionChain AS (
     LEFT JOIN FormasEspeciales fe ON fe.id_pokemon_original = p.id
     LEFT JOIN Generacion g ON p.generacion = g.id
     LEFT JOIN (
-        SELECT original_id, chain
+        SELECT original_id, GROUP_CONCAT(DISTINCT chain SEPARATOR '|') AS chain
         FROM EvolutionChain
-        WHERE (original_id, step) IN (
-            SELECT original_id, MAX(step)
-            FROM EvolutionChain
-            GROUP BY original_id
-        )
+        GROUP BY original_id
     ) ec ON ec.original_id = p.id
     LEFT JOIN (
         SELECT final_id, chain

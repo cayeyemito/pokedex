@@ -74,11 +74,24 @@
                                     <img src="img/animacion-mega.png" class="mega-evolution-icon-anim" id="megaEvoAnim">
                                 </div>
                             </div>
+                            <div class="mega-evolution-screen" id="megaEvoScreen2">
+                                <div class="mega-animation-container">
+                                    <img src="img/mega.png" class="mega-evolution-icon-anim2" id="mega2">
+                                </div>
+                            </div>
+                            <div class="mega-evolution-screen" id="megaEvoScreen3">
+                                <div class="mega-animation-container">
+                                    <img src="img/gigamax.png" class="mega-evolution-icon-anim2" id="gmax">
+                                </div>
+                            </div>
                             <div class="inner-screen-overlay-glass" id="inner-screen-overlay-glass">
                             </div>
                             <div class="guide-screen" id="guide-screen">
                                 <p class="guide-text">Bienvenido a la guia de la pokedex. Aqui te explciaremos su funcionamiento por si se encuentra perdido!<br><br>En este sector de la pokedex encontra diferentes botones, cada uno con su propia función. <br><br>1. El bton de shiny, a la derecha del boton de ayuda, le permitira canviar la imagen del pokémon en pantalla por su version shiny, asi podra verlo en su forma más especial. <br><br>2. A la derecha tenemos el boton de fondo. Cada tipo cuenta con dos fondos, el basico y el animado, quedate con el que mas te guste! <br><br> 3. A continuación tenemos el dpad, cuya función principal sera moverse por la pantalla de la derecha. Con los botones de derecha e izquierda podra ir canviando entre los diferentes menus, como habilidades, movimientos, etc., mientras que los botones de arriba y abajo te permitiran desplazarte, en los menus que lo permitan, al siguiente movimiento por ejemplo
                                 </p>
+                            </div>
+                            <div class="guide-screen flex" id="filtrador">
+                                
                             </div>
                         </div>
                         <div class="bottom-decorations-container">
@@ -165,7 +178,7 @@
                                 <div class="directional left" onclick="passPreviousStat()"></div>
                             </div>
                             <div class="dpad-middle">
-                                <div class="circle circleBig"></div>
+                                <div class="circle circleBig" onclick="showFilter()"></div>
                             </div>
                             <div class="dpad-right">
                                 <div class="directional right" onclick="passNextStat()"></div>
@@ -186,61 +199,16 @@
                     <div class="info-screen-container">
                         <div class="pokemon-info-container" id="infoScreen">
                             <div class="basic-info-container" id="basicInfo">
-                                <!-- <div class="info">
-                                    <div class="tittle-container">
-                                        <div class="tittle">
-                                            <h1 class="info-text-tittle line-ability">Altura</h1>
-                                        </div>
-                                        <div class="empty"></div>
-                                        <div class="tittle">
-                                            <h1 class="info-text-tittle line-ability">Peso</h1>
-                                        </div>
-                                    </div>
-                                    <div class="text-container">
-                                        <div class="text">
-                                            <h2 class="info-text" id="infoHeight"></h2>
-                                        </div>
-                                        <div class="empty"></div>
-                                        <div class="text">
-                                            <h2 class="info-text" id="infoWeight"></h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tipo">
-                                    <div class="tittle-container">
-                                        <h1 class="info-text-tittle line-ability" id="tipos"></h1>
-                                    </div>
-                                    <div class="text-container">
-                                        <div class="tipo-container">
-                                            <img src="img/iconos_tipos/Icon_grass.webp" id="tipo1" class="littleIconTipo" alt="">
-                                        </div>
-                                        <div class="empty-icon" id="empty"></div>
-                                        <div class="tipo-container" id="tipo2Container">
-                                            <img src="img/iconos_tipos/Icon_poison.webp" id="tipo2" class="littleIconTipo" alt="">
-                                        </div>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                         <div class="pokemon-stats-chart-container" id="statScreen">
                             <canvas id="pokemonStatsChart" class="pokemon-stat-graphic"></canvas>
                         </div>
                         <div class="pokemon-movements-container" id="movementScreen">
-                            <div class="level-movements" id="level">
-                                <img src="img/levelup.png" class="icono-movimientos" onclick="showMovements(1)">
-                            </div>
-                            <div class="egg-movements" id="huevo">
-                                <img src="img/huevo-de-pascua.png" class="icono-movimientos" onclick="showMovements(2)">
-                            </div>
-                            <div class="machine-movements" id="maquina">
-                                <img src="img/computadora.png" class="icono-movimientos white" onclick="showMovements(3)">
-                            </div>
-                            <div class="tutor-movements" id="tutor">
-                                <img src="img/profesor.png" class="icono-movimientos" onclick="showMovements(4)">
-                            </div>
                         </div>
-                        <div class="pokemon-evolution-container">
-
+                        <div class="pokemon-evolution-container" id="evolutionScreen">
+                        </div>
+                        <div class="pokemon-abilities-container flex-direction" id="abilityScreen">>
                         </div>
                     </div>
                     <div class="pokemon-stat-position-container">

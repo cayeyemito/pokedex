@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include 'db.php';
 
 header('Content-Type: application/json');
@@ -117,11 +120,74 @@ if (isset($_REQUEST["habilidad"])) {
 
     echo json_encode($response);
     exit();
+} else if (isset($_POST["evoluciones"])){
+
+    $numeros = explode(",", $_POST["evoluciones"]);
+
+    if ($conn->connect_error) {
+        http_response_code(500);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Error de conexión a la base de datos"
+        ]);
+        exit();
+    }
+
+    $pokemons = [];
+
+    foreach ($numeros as $numero) {
+        $stmt = $conn->prepare("SELECT id, imagen FROM Pokemon WHERE id = ?");
+    
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode([
+                "status" => "error",
+                "message" => "Error en preparación de consulta: " . $conn->error
+            ]);
+            exit();
+        }
+    
+        $numero = (int)$numero;
+        $stmt->bind_param("i", $numero);
+    
+        if (!$stmt->execute()) {
+            http_response_code(500);
+            echo json_encode([
+                "status" => "error",
+                "message" => "Error al ejecutar consulta: " . $stmt->error
+            ]);
+            exit();
+        }
+    
+        $result = $stmt->get_result();
+    
+        if ($result->num_rows > 0) {
+            $pokemon = $result->fetch_assoc();
+            $pokemons[] = $pokemon;
+        } else {
+            $pokemons[] = [
+                "status" => "error",
+                "id" => $numero,
+                "message" => "Pokémon no encontrado"
+            ];
+        }
+    
+        $stmt->close();
+    }
+
+    // Cerrar la conexión con la base de datos
+    $conn->close();
+
+    // Devolver los resultados como un JSON
+    echo json_encode([
+        "status" => "success",
+        "data" => $pokemons
+    ]);
+    exit();
 } else {
-    http_response_code(400);
     echo json_encode([
         "status" => "error",
-        "message" => "Falta el parámetro 'habilidad'"
+        "message" => "No se recibió ninguna petición válida"
     ]);
     exit();
 }

@@ -11,6 +11,8 @@ let stat5 = document.getElementById("stat5")
 let statsScreen = document.getElementById("statScreen")
 let movementScreen = document.getElementById("movementScreen")
 let infoScreen = document.getElementById("infoScreen")
+let evolutionScreen = document.getElementById("evolutionScreen")
+let abilityScreen = document.getElementById("abilityScreen")
 let pokemon = []
 let innerScreen = document.getElementById("inner-screen")
 let innerScreenOverlay = document.getElementById("inner-screen-overlay")
@@ -28,13 +30,43 @@ let movimientos = {
 }
 let id = 1
 let idMovimiento = 0
+let idAbility = 0
 let idMovimientoTipo
 let isChanged = false
 let formasArray = [];
 let formsScreen = document.getElementById("formsIcons")
 let pokemonOriginal
 let pokemonEspecialForm = false
-let isMega = true
+let isMega = false
+let isGigamax = false
+let isFormaAlterna = false
+let idEvolucion = 0
+let comprobacion
+let formasArrayId = [];
+let esImportante = false;
+let idForma = -1
+let hasChanged = false
+const pokemonTypes = [
+    "normal",
+    "fire",
+    "water",
+    "grass",
+    "electric",
+    "ice",
+    "fighting",
+    "poison",
+    "ground",
+    "flying",
+    "psychic",
+    "bug",
+    "rock",
+    "ghost",
+    "dragon",
+    "dark",
+    "steel",
+    "fairy"
+];
+let arrayFiltroId = []
 
 async function initialize(numberPokedex) {
 
@@ -43,7 +75,7 @@ async function initialize(numberPokedex) {
     }
 
     if(!pokemonEspecialForm){
-        pokemon = await getPokemonInfo(numberPokedex);
+        pokemon = await getPokemonInfo(id);
         getForms()
     } else {
         pokemon = await getSpecialPokemonInfo(numberPokedex);
@@ -53,44 +85,80 @@ async function initialize(numberPokedex) {
             nombre_region: pokemonOriginal.nombre_region
         })
         pokemonEspecialForm = false
-        formsScreen.innerHTML =`<div class="mega-evolution-container">
-                                    <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="megaEvolution(${id})">
-                                </div>`
+        formsScreen.innerHTML = ""
+        if(esImportante && formasArrayId.length != 0 && !isMega && !isGigamax && !isFormaAlterna){
+            formsScreen.innerHTML += `<div class="mega-evolution-container">
+                                        <img src="img/flecha-izquierda-forma.png" class="mega-evolution-icon" onclick="
+                                            passPreviousForm()">
+                                    </div>`
+        }
+        if(isMega && pokemon.nombre.includes("mega")){
+            formsScreen.innerHTML +=`<div class="mega-evolution-container">
+                                        <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
+                                    </div>`
+        } else if(isMega && pokemon.nombre.includes("kyogre-primal")){
+            formsScreen.innerHTML +=`<div class="mega-evolution-container">
+                                        <img src="img/kyogrePrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
+                                    </div>`
+
+        } else if(isMega && pokemon.nombre.includes("groudon-primal")){
+            formsScreen.innerHTML +=`<div class="mega-evolution-container">
+                                        <img src="img/groudonPrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
+                                    </div>`
+
+        } else if(isGigamax){
+            formsScreen.innerHTML +=`<div class="mega-evolution-container">
+                                        <img src="img/gigamax.png" class="mega-evolution-icon" onclick="startGigamax(${id})">
+                                    </div>`
+        } else if (isFormaAlterna) {
+            let juego = "";
+        
+            if (pokemon.nombre.toLowerCase().includes("hisui")) {
+                juego = "hisui";
+            } else if (pokemon.nombre.toLowerCase().includes("paldea")) {
+                juego = "paldea";
+            } else if (pokemon.nombre.toLowerCase().includes("alola")) {
+                juego = "alola";
+            } else if (pokemon.nombre.toLowerCase().includes("galar")) {
+                juego = "galar";
+            }
+        
+            formsScreen.innerHTML += `
+                <div class="mega-evolution-container">
+                    <img src="img/${juego}.png" class="mega-evolution-icon logo-sol-icono"
+                         onclick="toggleFormaRegional(${id})">
+                </div>`;
+        } else if(!esImportante){
+            formsScreen.innerHTML = `<div class="mega-evolution-container">
+                                        <img src="img/flecha-izquierda-forma.png" class="mega-evolution-icon" onclick="
+                                            passPreviousForm()">
+                                    </div>
+                                    <div class="mega-evolution-container">
+                                        <img src="img/flecha-derecha-forma.png" class="mega-evolution-icon" onclick="
+                                            passNextForm()">
+                                    </div>`;
+        }
+        if(esImportante && formasArrayId.length != 0 && !isMega && !isGigamax && !isFormaAlterna){
+            formsScreen.innerHTML += `<div class="mega-evolution-container">
+                                        <img src="img/flecha-derecha-forma.png" class="mega-evolution-icon" onclick="
+                                            passNextForm()">
+                                    </div>`
+        }
     }
 
-    const tiposMovimiento = [
-        { tipo: 'level', id: 1, icono: 'levelup.png' },
-        { tipo: 'huevo', id: 2, icono: 'huevo-de-pascua.png' },
-        { tipo: 'maquina', id: 3, icono: 'computadora.png', extraClass: 'white' },
-        { tipo: 'tutor', id: 4, icono: 'profesor.png' }
-    ];
-    
-    tiposMovimiento.forEach(({ tipo, id, icono, extraClass = '' }) => {
-        // Usamos la notación dinámica para obtener el atributo correcto
-        const movKey = `mov${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`; 
-    
-        const data = pokemon[movKey]; 
-        const element = document.getElementById(tipo);
-    
-        if (data != null) {
-            element.style.display = 'flex';
-            element.innerHTML = `
-                <img src="img/${icono}" class="icono-movimientos ${extraClass}" onclick="showMovements(${id})">
-            `;
-            movimientos[tipo] = getAllMovements(id, data); // sin await
-        } else {
-            element.style.display = 'none';
-        }
-    });
+    showMovementsOptions(0)
     
     createBasicInfo()
     
     innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
     innerScreen.style.backgroundImage = `url("img/tipos/${pokemon.tipo}/${pokemon.tipo}.jpg")`
-    pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`    
+    pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+    
+    createEvolutionChain()
 
     habilidades = await getAllAbilities()
     habilidades.sort((a, b) => a.oculta - b.oculta);
+    createAbiltyInfo()
 
     if (pokemon) {
         const pokemonStats = {
@@ -219,6 +287,67 @@ function showGuide(){
     }
 }
 
+function showFilter(){
+    let innerScreen = document.getElementById("inner-screen")
+    let innerScreenOverlay = document.getElementById("inner-screen-overlay")
+    let filterScreen = document.getElementById("filtrador")
+
+    if(!guideChanged){
+        innerScreen.style.filter = "blur(1.5rem)"
+        innerScreenOverlay.style.visibility = "blur(1.5rem)"
+        filterScreen.style.visibility = "visible"
+        filterScreen.innerHTML = ""
+        for(let i=0; i<pokemonTypes.length-1;i++){
+            filterScreen.innerHTML += `<div class="tipo-container-filter">
+                                        <img src="img/iconos_tipos/Icon_${pokemonTypes[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${pokemonTypes[i]}')">
+                                    </div>`
+        }
+        guideChanged = true
+    } else{
+        innerScreen.style.filter = "blur(0)"
+        innerScreenOverlay.style.visibility = "blur(0)"
+        filterScreen.style.visibility = "hidden"
+        guideChanged = false
+    }
+}
+
+async function establecerFiltro(tipo){
+    try {
+        // Crea el cuerpo de la solicitud con el número de Pokémon  // Aquí deberías pasar el número que deseas buscar
+        const bodyData = new URLSearchParams();
+        bodyData.append('tipo', tipo);
+      
+        // Realiza la solicitud POST
+        const response = await fetch("../php/getPokemon.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: bodyData.toString()  // Convierte el cuerpo de los parámetros en un string
+        });
+    
+        // Verifica si la respuesta es exitosa
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+    
+        // Obtiene la respuesta como texto
+        const text = await response.text();
+    
+        // Intenta parsear la respuesta JSON
+        const data = JSON.parse(text);
+    
+        // Verifica si la respuesta es correcta
+        if (data.status === "success") {
+            arrayFiltroId = data.data
+            console.log(arrayFiltroId)
+        } else {
+            console.warn("No se encontró el Pokémon:", data.message);
+        }
+      
+    } catch (error) {
+        console.error("Error al obtener datos:", error);
+    }
+}
+
 function showShiny(){
     let innerScreenOverlay = document.getElementById("inner-screen-overlay")
 
@@ -257,16 +386,20 @@ function passNextStat() {
         stat2.style.transform = "scale(1)"
         stat++
     } else if (stat === 3){
+        evolutionScreen.style.visibility = "visible"
         movementScreen.style.visibility = "hidden"
         stat4.style.transform = "scale(1.3)"
         stat3.style.transform = "scale(1)"
         stat++
     } else if (stat === 4){
+        abilityScreen.style.visibility = "visible"
+        evolutionScreen.style.visibility = "hidden"
         stat5.style.transform = "scale(1.3)"
         stat4.style.transform = "scale(1)"
         stat++
     } else {
         infoScreen.style.visibility = "visible"
+        abilityScreen.style.visibility = "hidden"
         stat1.style.transform = "scale(1.3)"
         stat5.style.transform = "scale(1)"
         stat=1
@@ -275,6 +408,7 @@ function passNextStat() {
 
 function passPreviousStat() {
     if(stat === 1){
+        abilityScreen.style.visibility = "visible"
         infoScreen.style.visibility = "hidden"
         stat5.style.transform = "scale(1.3)" 
         stat1.style.transform = "scale(1)"
@@ -293,10 +427,13 @@ function passPreviousStat() {
         stat--
     } else if (stat === 4){
         movementScreen.style.visibility = "visible"
+        evolutionScreen.style.visibility = "hidden"
         stat3.style.transform = "scale(1.3)"
         stat4.style.transform = "scale(1)"
         stat--
     } else {
+        abilityScreen.style.visibility = "hidden"
+        evolutionScreen.style.visibility = "visible"
         stat4.style.transform = "scale(1.3)"
         stat5.style.transform = "scale(1)"
         stat--
@@ -323,12 +460,23 @@ function searchPokemon(){
     let numberToTry = document.getElementById("pokemon-name-text").innerText
     id = parseInt(numberToTry);
     
-    const blueButton = document.querySelector(".blue-button");
-    blueButton.classList.add("parpadeando"); // Comienza a parpadear
+    if(id!=0){
+        resetAll()
+        const blueButton = document.querySelector(".blue-button");
+        blueButton.classList.add("parpadeando");
 
-    initialize(id).finally(() => {
-        blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
-    });
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando");
+        });
+    } else {
+        pokeNameIdText.innerText = "ERROR";
+        pokeNameIdText.classList.add("blink");
+
+        setTimeout(() => {
+        pokeNameIdText.classList.remove("blink");
+        pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+        }, 3000);
+    }
 }
 
 function deleteLastNumber(){
@@ -532,7 +680,7 @@ function reproSoundCry(){
 }
 
 function nextPokemon(){
-    showMovementsOptions(1)
+    resetAll()
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
     if(id<1025){
@@ -548,8 +696,18 @@ function nextPokemon(){
     }
 }
 
+function resetAll(){
+    isMega = false;
+    isGigamax = false;
+    isFormaAlterna = false;
+    idAbility = 0
+    idForma = -1
+    formasArrayId = []
+    hasChanged = false
+}
+
 function previousPokemon(){
-    showMovementsOptions(1)
+    resetAll()
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); // Comienza a parpadear
     if(id>1){
@@ -563,6 +721,45 @@ function previousPokemon(){
             blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
         });
     }
+}
+
+function passNextForm(){
+    if(!hasChanged){
+        pokemonOriginal = pokemon
+        hasChanged = true
+    }
+    pokemonEspecialForm = true;
+    if(idForma<formasArrayId.length-1){
+        idForma++
+        initialize(formasArrayId[idForma])
+    } else{
+        pokemonEspecialForm = false
+        initialize(id)
+        idForma = -1
+    }
+    console.log(idForma)
+}
+
+function passPreviousForm(){
+    if(!hasChanged){
+        pokemonOriginal = pokemon
+        hasChanged = true
+    }
+    pokemonEspecialForm = true;
+
+    if(idForma>0){
+        idForma--
+        initialize(formasArrayId[idForma])
+    } else if(idForma > -1){
+        idForma = -1;
+        pokemonEspecialForm = false
+        initialize(id)
+    } 
+    else{
+        idForma = formasArrayId.length-1
+        initialize(formasArrayId[idForma])
+    }
+    console.log(idForma)
 }
 
 async function passNextAttack() {
@@ -589,6 +786,16 @@ async function passNextAttack() {
             : idMovimiento + 1;
 
         showMovements(idMovimientoTipo);
+    } else if(stat === 5) {
+        idAbility = (idAbility === habilidades.length - 1)
+            ? 0
+            : idAbility + 1;
+        createAbiltyInfo()
+    } else if(stat === 4 && comprobacion.length > 0){
+        idEvolucion = (idEvolucion === comprobacion.length - 1)
+            ? 0
+            : idAbility + 1;
+        createEvolutionChain()
     }
 }
 
@@ -616,6 +823,16 @@ async function passPreviousAttack() {
             : idMovimiento - 1;
 
         showMovements(idMovimientoTipo);
+    } else if(stat === 5) {
+        idAbility = (idAbility === 0)
+            ? habilidades.length - 1
+            : idAbility - 1;
+        createAbiltyInfo()
+    } else if(stat === 4 && comprobacion.length > 0){
+        idEvolucion = (idEvolucion ===0)
+            ? comprobacion.length - 1
+            : idEvolucion - 1;
+        createEvolutionChain()
     }
 }
 
@@ -630,6 +847,7 @@ async function showMovements(num){
     switch (num) {
         case 1:
             arrayMoves = await movimientos.level;
+            arrayMoves.sort((a, b) => a.level - b.level);
             level = `Lv${arrayMoves[idMovimiento]?.level ?? "-"}`;
             break;
         case 2:
@@ -685,38 +903,45 @@ async function showMovements(num){
                                         <h1 class="valor">${pp}</h1>
                                     </div>
                                     <div class="back-container">
-                                        <img src="img/cerrar.png" class="icono-cruz" onclick="showMovementsOptions(0)")>
+                                        <img src="img/cerrar.png" class="icono-cruz" onclick="showMovementsOptions(1)")>
                                     </div>
                                 </div>`
 }
 
-function showMovementsOptions(numeroOption){
-    isChanged = false
-    idMovimiento = 0
-    movementScreen.innerHTML = ""
-    movementScreen.classList.remove('flex-direction')
-    let linea1 = ""
-    let linea2 = ""
-    let linea3 = ""
-    let linea4 = ""
-    if(numeroOption === 0){
-        linea1 = `<img src="img/levelup.png" class="icono-movimientos" onclick="showMovements(1)">`
-        linea2 = `<img src="img/huevo-de-pascua.png" class="icono-movimientos" onclick="showMovements(2)">`
-        linea3 = `<img src="img/computadora.png" class="icono-movimientos white" onclick="showMovements(3)">`
-        linea4 = `<img src="img/profesor.png" class="icono-movimientos" onclick="showMovements(4)">`
+function showMovementsOptions(numMov) {
+    isChanged = false;
+    idMovimiento = 0;
+    movementScreen.innerHTML = "";
+    movementScreen.classList.remove('flex-direction');
+
+    if (numMov === 1) {
+        linea1 = linea2 = linea3 = linea4 = "";
     }
-    movementScreen.innerHTML = `<div class="level-movements" id="level">
-                                    ${linea1}
-                                </div>
-                                <div class="egg-movements" id="huevo">
-                                    ${linea2}
-                                </div>
-                                <div class="machine-movements" id="maquina">
-                                    ${linea3}
-                                </div>
-                                <div class="tutor-movements" id="tutor">
-                                    ${linea4}
-                                </div>`
+
+    const tiposMovimiento = [
+        { tipo: 'level', id: 1, icono: 'levelup.png' },
+        { tipo: 'huevo', id: 2, icono: 'huevo-de-pascua.png', extraClass2: "egg-movements"},
+        { tipo: 'maquina', id: 3, icono: 'computadora.png', extraClass: 'white', extraClass2: "machine-movements"},
+        { tipo: 'tutor', id: 4, icono: 'profesor.png' }
+    ];
+
+    let htmlFinal = "";
+
+    tiposMovimiento.forEach(({ tipo, id, icono, extraClass = '', extraClass2 = ''}) => {
+        const movKey = `mov${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+        const data = pokemon[movKey];
+
+        if (data != null) {
+            htmlFinal += `
+                <div class="${tipo}-movements ${extraClass2}" id="${tipo}">
+                    <img src="img/${icono}" class="icono-movimientos ${extraClass}" onclick="showMovements(${id})">
+                </div>
+            `;
+            movimientos[tipo] = getAllMovements(id, data); // si lo necesitas aquí sin await
+        }
+    });
+
+    movementScreen.innerHTML = htmlFinal;
 }
 
 function createBasicInfo(){
@@ -731,66 +956,15 @@ function createBasicInfo(){
         widht = "biggerWidht"
     }
 
-    function getGenderHTML(genderRate) {
-        const genderMap = {
-            "-1": [],
-            "0": [{ img: "hombre.png", class: "h-container", percent: "100%" }],
-            "1": [
-                { img: "hombre.png", class: "h-container", percent: "87.5%" },
-                { img: "mujer.png", class: "m-container", percent: "12.5%" }
-            ],
-            "2": [
-                { img: "hombre.png", class: "h-container", percent: "75%" },
-                { img: "mujer.png", class: "m-container", percent: "25%" }
-            ],
-            "3": [
-                { img: "hombre.png", class: "h-container", percent: "62.5%" },
-                { img: "mujer.png", class: "m-container", percent: "37.5%" }
-            ],
-            "4": [
-                { img: "hombre.png", class: "h-container", percent: "50%" },
-                { img: "mujer.png", class: "m-container", percent: "50%" }
-            ],
-            "5": [
-                { img: "hombre.png", class: "h-container", percent: "37.5%" },
-                { img: "mujer.png", class: "m-container", percent: "62.5%" }
-            ],
-            "6": [
-                { img: "hombre.png", class: "h-container", percent: "25%" },
-                { img: "mujer.png", class: "m-container", percent: "75%" }
-            ],
-            "7": [
-                { img: "hombre.png", class: "h-container", percent: "12.5%" },
-                { img: "mujer.png", class: "m-container", percent: "87.5%" }
-            ],
-            "8": [{ img: "mujer.png", class: "m-container", percent: "100%" }]
-        };
-      
-        const genderInfo = genderMap[genderRate];
-      
-        if (!genderInfo) return "Valor desconocido";
-      
-        if (genderInfo.length === 0) return ""; // Caso sin género
-      
-        return genderInfo
-        .map(
-            (g) => `
-            <div class="genero-container">
-                <div class="${g.class}">
-                    <img src="img/${g.img}" class="icono-genero">
-                    <h1 class="valor2">${g.percent}</h1>
-                </div>
-            </div>`
-        )
-        .join("");
-    }
-      
-      // Ejemplo de uso:
-    const description = getGenderHTML(pokemon.genero);      
+    const genero = getGenderHTML(pokemon.genero); 
+    const nombre = pokemon.nombre
+        .split("-")
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
+        .join(" ");  
 
     basicInfoContainer.innerHTML = `<div class="top-container-movements">
                                         <div class="movement-title-container ${widht}">
-                                            <h1 class="movement-name-text line-ability">${pokemon.nombre}</h1>
+                                            <h1 class="movement-name-text line-ability">${nombre}</h1>
                                         </div>
                                         <div class="movement-type-container">
                                             <img src="img/iconos_tipos/Icon_${pokemon.tipo}.webp" class="icono-ataques-tipo">
@@ -809,67 +983,420 @@ function createBasicInfo(){
                                             <h1 class="precision">Altura <br></h1>
                                             <h1 class="valor">${pokemon.altura} m</h1>
                                         </div>
-                                        ${description}
+                                        ${genero}
                                     </div>`
 }
 
+function getGenderHTML(genderRate) {
+    const genderMap = {
+        "-1": [],
+        "0": [{ img: "hombre.png", class: "h-container", percent: "100%" }],
+        "1": [
+            { img: "hombre.png", class: "h-container", percent: "87.5%" },
+            { img: "mujer.png", class: "m-container", percent: "12.5%" }
+        ],
+        "2": [
+            { img: "hombre.png", class: "h-container", percent: "75%" },
+            { img: "mujer.png", class: "m-container", percent: "25%" }
+        ],
+        "3": [
+            { img: "hombre.png", class: "h-container", percent: "62.5%" },
+            { img: "mujer.png", class: "m-container", percent: "37.5%" }
+        ],
+        "4": [
+            { img: "hombre.png", class: "h-container", percent: "50%" },
+            { img: "mujer.png", class: "m-container", percent: "50%" }
+        ],
+        "5": [
+            { img: "hombre.png", class: "h-container", percent: "37.5%" },
+            { img: "mujer.png", class: "m-container", percent: "62.5%" }
+        ],
+        "6": [
+            { img: "hombre.png", class: "h-container", percent: "25%" },
+            { img: "mujer.png", class: "m-container", percent: "75%" }
+        ],
+        "7": [
+            { img: "hombre.png", class: "h-container", percent: "12.5%" },
+            { img: "mujer.png", class: "m-container", percent: "87.5%" }
+        ],
+        "8": [{ img: "mujer.png", class: "m-container", percent: "100%" }]
+    };
+  
+    const genderInfo = genderMap[genderRate];
+  
+    if (!genderInfo) return "Valor desconocido";
+  
+    if (genderInfo.length === 0) return ""; // Caso sin género
+  
+    return genderInfo
+    .map(
+        (g) => `
+        <div class="genero-container">
+            <div class="${g.class}">
+                <img src="img/${g.img}" class="icono-genero">
+                <h1 class="valor2">${g.percent}</h1>
+            </div>
+        </div>`
+    )
+    .join("");
+}
+
+function createAbiltyInfo(){
+    let oculta = ""
+    let widht = "big-widht"
+    if(habilidades[idAbility].oculta===1){
+        oculta = "Oculta"
+        widht = ""
+    }
+    abilityScreen.innerHTML = `<div class="top-container-movements">
+                                        <div class="movement-title-container ${widht}">
+                                            <h1 class="movement-name-text line-ability">${habilidades[idAbility].nombre}</h1>
+                                        </div>
+                                        <div class="movement-type-container2">
+                                            <h1 class="movement-name-text">${oculta}</h1>
+                                        </div>
+                                    </div>
+                                    <div class="middle-container-movements">
+                                        <h1 class="movement-description-text">${habilidades[idAbility].descripcion}</h1>
+                                </div>`
+}
+
 function getForms(){
-    if(pokemon.formaEspecial != null){
-        let formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(String);
-        let formasArrayId = pokemon.formaEspecial.split(",").map(String);
-        for(i = 0; i<formasArrayNombre.length; i++){
-            formasArray.push({id:formasArrayId[i], nombre:formasArrayNombre[i]})
-        }
-        for(i = 0; i<formasArray.length;i++){
-            if(formasArray[i].nombre.includes("mega") || pokemon.nombre.includes("mega")){
-                formsScreen.innerHTML =`<div class="mega-evolution-container">
-                                            <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="megaEvolution(${formasArray[i].id})">
-                                        </div>`
+    let countMega = 0;
+    let idMega = [];
+    let x = 0, y = 0, mega = 0;
+    let gmax = null, paldea = null, alola = null, hisui = null, galar = null, kyogrePrimal = null, groudonPrimal = null;
+
+    if (pokemon.formaEspecial != null) {
+        formsScreen.innerHTML = "";
+        let formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
+        formasArrayIdSinRecortar = pokemon.formaEspecial.split(",").map(s => s.trim());
+        formasArrayId =pokemon.formaEspecial.split(",").map(s => s.trim());
+        let recorte = false
+
+        for (let i = 0, k = 0; i < formasArrayNombre.length; i++, k++) {
+            const forma = formasArrayNombre[i];
+            recorte = false
+
+            if (forma.includes("mega")) {
+                countMega++;
+                mega = i;
+                idMega.push(formasArrayIdSinRecortar[i]);
+                esImportante = true;
+                recorte = true;
+
+                if (forma.includes("x")) x = i;
+                else y = i;
+
+            } else if (forma.includes("gmax")) {
+                gmax = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("hisui")) {
+                hisui = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("alola")) {
+                alola = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("paldea")) {
+                paldea = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("galar")) {
+                galar = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("kyogre-primal")) {
+                kyogrePrimal = i;
+                esImportante = true;
+                recorte = true;
+
+            } else if (forma.includes("groudon-primal")) {
+                groudonPrimal = i;
+                esImportante = true;
+                recorte = true;
+            }
+
+            formasArray.push({ id: formasArrayIdSinRecortar[i], nombre: forma });
+
+            if (recorte) {
+                formasArrayId.splice(k, 1);
+                k--;
             }
         }
+        // Mega evoluciones
+        if (countMega === 1) {
+            formsScreen.innerHTML += `
+                <div class="mega-evolution-container">
+                    <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="startMegaEvo(${idMega[mega]})">
+                </div>`;
+        } else if (countMega === 2) {
+            formsScreen.innerHTML += `
+                <div class="mega-evolution-container">
+                    <img src="img/mega-x.png" class="mega-evolution-icon2 mega-left" onclick="startMegaEvo(${idMega[x]})">
+                    <img src="img/mega-y.png" class="mega-evolution-icon2 mega-right" onclick="startMegaEvo(${idMega[y]})">
+                </div>`;
+        }
+
+        // Formas especiales
+        const formasEspeciales = [
+            { nombre: "gigamax", clase: "blanco", funcion: "startGigamax", index: gmax },
+            { nombre: "alola", clase: "logo-sol-icono", funcion: "toggleFormaRegional", index: alola },
+            { nombre: "hisui", clase: "logo-leyendas-icono", funcion: "toggleFormaRegional", index: hisui },
+            { nombre: "paldea", clase: "logo-leyendas-icono", funcion: "toggleFormaRegional", index: paldea },
+            { nombre: "galar", clase: "logo-sol-icono", funcion: "toggleFormaRegional", index: galar },
+            { nombre: "kyogrePrimal", clase: "logo-primal-k-icono", funcion: "startMegaEvo", index: kyogrePrimal },
+            { nombre: "groudonPrimal", clase: "logo-primal-k-icono", funcion: "startMegaEvo", index: groudonPrimal },
+        ];
+
+        if(esImportante && formasArrayId.length != 0){
+            formsScreen.innerHTML += `<div class="mega-evolution-container">
+                                        <img src="img/flecha-izquierda-forma.png" class="mega-evolution-icon" onclick="
+                                            passPreviousForm()">
+                                    </div>`
+        }
+
+        formasEspeciales.forEach(forma => {
+            if (forma.index !== null && formasArray[forma.index] && formasArrayId.length === 0) {
+                formsScreen.innerHTML += `
+                    <div class="mega-evolution-container">
+                        <img src="img/${forma.nombre}.png" class="mega-evolution-icon ${forma.clase}" onclick="
+                        ${forma.funcion}(${formasArray[forma.index].id})">
+                    </div>`;
+            } else if(forma.index !== null && formasArray[forma.index] && formasArrayId.length != 0){
+                formsScreen.innerHTML += `
+                    <div class="mega-evolution-container">
+                        <img src="img/${forma.nombre}.png" class="mega-evolution-icon ${forma.clase}" onclick="
+                        ${forma.funcion}(${formasArray[forma.index].id})">
+                    </div>`;
+            } else if(!esImportante){
+                formsScreen.innerHTML = `<div class="mega-evolution-container">
+                                            <img src="img/flecha-izquierda-forma.png" class="mega-evolution-icon" onclick="
+                                                passPreviousForm()">
+                                        </div>
+                                        <div class="mega-evolution-container">
+                                            <img src="img/flecha-derecha-forma.png" class="mega-evolution-icon" onclick="
+                                                passNextForm()">
+                                        </div>`;
+            }
+        });
+
+        if(esImportante && formasArrayId.length != 0){
+            formsScreen.innerHTML += `<div class="mega-evolution-container">
+                                        <img src="img/flecha-derecha-forma.png" class="mega-evolution-icon" onclick="
+                                            passNextForm()">
+                                    </div>`
+        }
+
     } else {
-        formsScreen.innerHTML = ""
+        formsScreen.innerHTML = "";
     }
 }
 
-async function megaEvolution(newId) {
-    let megaEvo = document.getElementById("megaEvoScreen");
-    let megaEvoAnim = document.getElementById("megaEvoAnim");
-    let megaCont = document.getElementById("megaContainer");
+async function createEvolutionChain(){
+    evolutionScreen.innerHTML = ""
+    let preevos = []
+    let evos = []
+    if (pokemon.preevolutions || pokemon.evolutions) {
+        if (pokemon.preevolutions != null) {
+            preevos = pokemon.preevolutions.split("<-");
+        }
+        if (pokemon.evolutions != null) {
+            comprobacion = pokemon.evolutions.split(";");
+            comprobacion = comprobacion.filter((c1, i) => 
+                !comprobacion.some((c2, j) => i !== j && c2.includes(c1))
+            );
+            evos = comprobacion[idEvolucion].split("->");
+        }
 
-    pokemonOriginal = pokemon;
-    pokemonEspecialForm = true;
+        let ids = [];
+        let metodos = [];
 
-    // Determinar el ID final según si está mega o no
-    const finalId = isMega ? newId : id;
-    isMega = !isMega;
+        // Lógica para manejar las evoluciones
+        if (evos.length === 5) {
+            ids = [evos[0], evos[2], evos[4]];
+            metodos = [evos[1], evos[3]]
+        } else if (evos.length === 3 && preevos.length === 3) {
+            ids = [preevos[0], evos[0], evos[2]]; 
+            metodos = [preevos[1], evos[1]]
+        } else if(evos.length === 3){
+            ids = [evos[0], evos[2]];
+            metodos = [evos[1]]
+        } else if(preevos.length === 3) {
+            ids = [preevos[0], preevos[2]];
+            metodos = preevos[1]
+        } else {
+            ids = [preevos[0], preevos[2], preevos[4]];
+            metodos = [preevos[1], preevos[3]]
+        }
 
-    // Mostrar contenedor y activar clases
-    megaEvo.style.display = 'flex';
-    megaEvo.classList.add('active');
+        try {
+            const bodyData = new URLSearchParams();
+            bodyData.append('evoluciones', ids.join(',')); 
 
-    // Reiniciar animaciones quitando y reañadiendo clases
-    megaEvoAnim.classList.remove('mega-animation');
-    megaCont.classList.remove('animate-glow');
+            const response = await fetch("../php/getThings.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: bodyData.toString()
+            });
 
-    // Forzar reflow para que la animación vuelva a ejecutarse
-    void megaEvoAnim.offsetWidth;
-    void megaCont.offsetWidth;
+            if (!response.ok) throw new Error("HTTP error " + response.status);
 
-    // Reaplicar clases que activan la animación
-    megaEvoAnim.classList.add('mega-animation');
-    megaCont.classList.add('animate-glow');
+            const text = await response.text();
+            const data = JSON.parse(text);
 
-    // Esperar a que termine la animación UNA vez
-    megaEvoAnim.addEventListener("animationend", function () {
-        initialize(finalId).finally(() => {
-            megaEvo.classList.remove('active');
-            megaEvoAnim.classList.remove('mega-animation');
-            megaCont.classList.remove('animate-glow');
-            megaEvo.style.display = 'none';
+            if (data.status === "success") {
+                const pokemonsEvo = data.data;
+                for (let i = 0; i < pokemonsEvo.length; i++) {
+                    // Mostrar el Pokémon
+                    evolutionScreen.innerHTML += `
+                        <div class="pokemon">
+                            <img src="${pokemonsEvo[i].imagen}" class="pokeImageEvo">
+                        </div>
+                    `;
+                
+                    // Si no es el último, añadir una flecha
+                    if (i < pokemonsEvo.length - 1) {
+                        if (Array.isArray(metodos)) {
+                            metodo = metodos[i];
+                        } else {
+                            metodo = metodos
+                        }
+                        evolutionScreen.innerHTML += `
+                            <div class="separator">
+                                <img src="img/flecha-derecha.png" class="flecha-evolucion">
+                                <span class="tooltip-text">${metodo}</span>
+                            </div>
+                        `;
+                    }
+                }
+            } else {
+                console.warn("No se encontraron los Pokémon:", data.message);
+            }
+
+        } catch (error) {
+            console.error("Error al obtener datos:", error);
+        }
+    } else {
+        evolutionScreen.innerHTML = `<h1 style="color: white;" class="clamp">Sin evolución</h1>`;
+    }
+}
+
+function startMegaEvo(newId) {
+    toggleForm({
+        newId,
+        isFormActive: isMega,
+        setFormActive: (val) => isMega = val,
+        animImageSrc: 'img/animacion-mega.png',
+        screenId: 'megaEvoScreen',
+        animId: 'megaEvoAnim',
+        screen2Id: 'megaEvoScreen2',
+        anim2Id: 'mega2',
+        glowClass: 'animate-glow'
+    });
+}
+
+function toggleFormaRegional(newId) {
+    const goingToForm = !isFormaAlterna;
+    isFormaAlterna = goingToForm;
+
+    if (goingToForm) {
+        pokemonOriginal = pokemon;
+        pokemonEspecialForm = true;
+        initialize(newId);
+    } else {
+        pokemonEspecialForm = false;
+        initialize(id); // id debe ser el ID original del Pokémon
+    }
+}
+
+function startGigamax(newId) {
+    toggleForm({
+        newId,
+        isFormActive: isGigamax,
+        setFormActive: (val) => isGigamax = val,
+        animImageSrc: 'img/dinamax-ball.png',
+        screenId: 'megaEvoScreen',
+        animId: 'megaEvoAnim',
+        screen2Id: 'megaEvoScreen3',
+        anim2Id: 'gmax',
+        glowClass: 'animate-glow2 red-glow'
+    });
+}
+
+async function toggleForm({
+    newId,
+    isFormActive,
+    setFormActive,
+    animImageSrc,
+    screenId,
+    animId,
+    screen2Id,
+    anim2Id,
+    glowClass
+}) {
+    const screen = document.getElementById(screenId);
+    const anim = document.getElementById(animId);
+    const container = document.getElementById("megaContainer");
+    const screen2 = document.getElementById(screen2Id);
+    const anim2 = document.getElementById(anim2Id);
+
+    // Mostrar pantalla de animación
+    screen.style.display = 'flex';
+    screen.classList.add('active');
+
+    // Reiniciar animaciones (forzar reflow)
+    anim.classList.remove('mega-animation');
+    anim2.classList.remove('smooth');
+    container.classList.remove('animate-glow', 'red-glow', 'animate-glow2');
+    void anim.offsetWidth;
+    void anim2.offsetWidth;
+    void container.offsetWidth;
+    anim.src = animImageSrc;
+    anim.classList.add('mega-animation');
+    container.classList.add(...glowClass.split(" "));
+    anim2.classList.add('smooth');
+
+    const goingToForm = !isFormActive;
+    setFormActive(goingToForm);
+
+    if (goingToForm) {
+        pokemonOriginal = pokemon;
+        pokemonEspecialForm = true;
+    } else {
+        pokemonEspecialForm = false;
+    }
+
+    const targetId = goingToForm ? newId : id;
+
+    const screen2Timeout = setTimeout(() => {
+        screen2.style.display = 'flex';
+        screen2.classList.add('active');
+    }, 2500);
+
+    anim.addEventListener("animationend", function () {
+        clearTimeout(screen2Timeout);
+        initialize(targetId).finally(() => {
+            screen.classList.remove('active');
+            anim.classList.remove('mega-animation');
+            container.classList.remove('animate-glow', 'red-glow', 'animate-glow2');
+            screen.style.display = 'none';
+            screen2.classList.remove('active');
+            screen2.style.display = 'none';
+            anim2.classList.remove('smooth');
         });
     }, { once: true });
 }
+
 
 function checkLandscape() {
     const warningDiv = document.querySelector("#orientation-warning");

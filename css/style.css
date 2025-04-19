@@ -21,6 +21,10 @@ html, body {
     height: 100%;
 }
 
+.clamp{
+    font-size: clamp(1vh, 3vh, 4.5vh);
+}
+
 body {
     background-image: url(../img/bg.png);
     background-size: cover;
@@ -407,6 +411,7 @@ body {
     pointer-events: none;
     overflow: hidden;
     display: none; /* Oculto por defecto */
+    border-radius: 6vh;
 }
 
 .mega-animation-container {
@@ -416,6 +421,7 @@ body {
     align-items: center;
     width: 100%;
     height: 100%;
+    border-radius: 6vh;
 }
 
 .mega-animation-container::after {
@@ -431,12 +437,21 @@ body {
     filter: blur(30px);
     mix-blend-mode: screen;
     pointer-events: none;
+    border-radius: 6vh;
 }
 
 .mega-animation-container.animate-glow::after {
     animation: glowEffect 4s ease-in-out forwards;
-  }
+}
 
+.mega-animation-container.animate-glow2::after {
+    animation: glowEffect2 4s ease-in-out forwards;
+}
+
+.mega-animation-container.red-glow::after {
+    background: radial-gradient(circle, rgb(217, 32, 32) 0%, rgba(255,0,0,0.3) 40%, rgba(255,255,255,0) 80%);
+}
+  
 /* Elimina el display: flex duplicado en JavaScript */
 .mega-evolution-screen.active {
     display: flex;
@@ -448,8 +463,29 @@ body {
     position: relative;
 }
 
+.mega-evolution-icon-anim2 {
+    width: 37%;
+    aspect-ratio: 1/1;
+    position: relative;
+}
+
 .mega-evolution-icon-anim.mega-animation {
     animation: megaZoom 4s ease-in-out forwards;
+}
+
+.mega-evolution-icon-anim2.smooth {
+    animation: smoothAppear 0.8s ease-out forwards;
+}
+
+@keyframes smoothAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes megaZoom {
@@ -463,6 +499,29 @@ body {
     80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
 }
+
+@keyframes glowEffect2 {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+        box-shadow: 0 0 20px rgba(62, 32, 217, 1), 0 0 50px rgba(62, 32, 217, 0.8), 0 0 100px rgba(62, 32, 217, 1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 40px rgba(62, 32, 217, 1), 0 0 80px rgba(62, 32, 217, 0.9), 0 0 150px rgba(62, 32, 217, 1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 60px rgba(62, 32, 217, 1), 0 0 120px rgba(62, 32, 217, 1), 0 0 200px rgba(62, 32, 217, 1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(3);
+        box-shadow: 0 0 80px rgba(62, 32, 217, 1), 0 0 160px rgba(62, 32, 217, 1), 0 0 250px rgba(62, 32, 217, 1);
+    }
+}  
 
 .inner-screen-overlay-glass{
     position: absolute;
@@ -962,7 +1021,7 @@ body {
     align-items: center;
 }
 
-.pokemon-stats-chart-container, .pokemon-movements-container, .pokemon-info-container{
+.pokemon-stats-chart-container, .pokemon-movements-container, .pokemon-info-container, .pokemon-evolution-container, .pokemon-abilities-container{
     position: absolute;
     height: 100%; 
     width: 100%; 
@@ -1072,42 +1131,10 @@ body {
     position: relative;
 }
 
-.tooltip-container {
-    position: relative;
-    display: inline-block;
-}
-
 .iconito {
     width: 1.2vw;
     aspect-ratio: 1 / 1;
     margin-left: 0.5vw;
-}
-
-.tooltip-text {
-    visibility: hidden;
-    opacity: 0;
-    width: max-content;
-    max-width: clamp(10vw, 30vw, 15vw);
-    background-color: #5c5c5c;
-    color: #fff;
-    text-align: center;
-    padding: 0.5vh 0.8vw;
-    border-radius: 0.5vh;
-
-    position: absolute;
-    z-index: 10;
-    bottom: 120%; /* por encima del icono */
-    left: 50%;
-    transform: translateX(-50%);
-    
-    transition: opacity 0.3s;
-    font-size: clamp(0.4rem, 1.2vw, 0.7rem);
-    white-space: normal;
-}
-
-.tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
 }
 
 .line-ability{
@@ -1127,7 +1154,11 @@ body {
     transform: scale(1.3);
 }
 
-.pokemon-movements-container, .pokemon-stats-chart-container{
+.big-widht{
+    width: 47% !important;
+}
+
+.pokemon-movements-container, .pokemon-stats-chart-container, .pokemon-evolution-container, .pokemon-abilities-container{
     visibility: hidden;
 }
 
@@ -1314,7 +1345,7 @@ body {
 
 .top-right-buttons-container, .bottom-right-things-container{
     position: relative;
-    width: 100%;
+    width: 90%;
     height: 50%;
     display: flex;
     justify-content: center;
@@ -1450,6 +1481,14 @@ body {
     align-items: center;
 }
 
+.middle-container-movements2{
+    position: relative;
+    width: 90%;
+    height: 40%;
+    display: flex;
+    justify-content: center;
+}
+
 .bottom-container-movements{
     position: relative;
     width: 100%;
@@ -1459,7 +1498,7 @@ body {
     align-items: center;
 }
 
-.movement-title-container, .movement-level-container, .movement-categorie-container, .movement-type-container{
+.movement-title-container, .movement-level-container, .movement-categorie-container, .movement-type-container, .movement-type-container2{
     position: relative;
     height: 100%;
 }
@@ -1467,6 +1506,13 @@ body {
 .movement-title-container{
     width: 48%;
     display: flex;
+    align-items: center;
+}
+
+.movement-type-container2{
+    width: 40%;
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
@@ -1502,11 +1548,12 @@ body {
 }
 
 .movement-description-text{
-    font-size: clamp(1vh, 1.8vh, 2vh);
+    font-size: clamp(1vh, 1.6vh, 1.8vh);
     color: white;
     font-family: 'retro', sans-serif;
     word-break: break-word;
     margin-left: 2%;
+    margin-top: 1vh; /* <- Añadido */
 }
 
 .middle-container-movements{
@@ -1590,7 +1637,7 @@ body {
 
 .mega-evolution-container{
     position: relative;
-    width: 33.33%;
+    width: 20%;
     height: 70%;
     display: flex;
     justify-content: center;
@@ -1599,17 +1646,148 @@ body {
 
 .mega-evolution-icon{
     position: relative;
-    width: 34%;
+    width: 50%;
     aspect-ratio: 1/1;
     cursor: pointer;
 }
 
+.mega-evolution-icon2 {
+    position: absolute;
+    width: 50%;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+}
+
+.mega-left {
+    clip-path: polygon(0% 0%, 47% 0%, 47% 100%, 0% 100%);
+    z-index: 2;
+}
+
+.mega-right {
+    clip-path: polygon(47% 0%, 100% 0%, 100% 100%, 47% 100%);
+    z-index: 1;
+}
+
 .bottom-right-things-container{
-    height: 30% !important;
+    height: 40% !important;
     margin-bottom: 5%;
+    border: 1.2vh solid #323232;
+    border-radius: 2vh;
+    background-color: black;
 }
 
 .mega-evolution-icon:active{
     transform: scale(0.9);
     filter: brightness(70%);
+}
+
+.mega-evolution-icon2:active{
+    transform: scale(0.9);
+    filter: brightness(70%);
+}
+
+.logo-sol-icono{
+    width: 90% !important;
+}
+
+.logo-primal-k-icono{
+    width: 50% !important;
+}
+
+.logo-leyendas-icono{
+    width: 70% !important;
+}
+
+.pokemon{
+    position: relative;
+    width: 25%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flecha-evolucion{
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+.separator{
+    position: relative;
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pokeImageEvo{
+    position: relative;
+    max-width: 100%;
+    height: auto;   
+}
+
+.blink {
+    animation: blink-animation 0.5s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
+
+.flecha-evolucion {
+    pointer-events: auto; 
+}
+
+
+.tooltip-text {
+    visibility: hidden;
+    width: max-content;
+    max-width: 900%;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    bottom: 65%; /* encima de la flecha */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+    white-space: normal;
+}
+
+.separator:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tipo-container-filter{
+    position: relative;
+    width: 25%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.iconos_tipos2{
+    width: 80%;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+}
+
+.iconos_tipos2:active{
+    filter: brightness(70%);
+    transform: scale(0.6);
 }
