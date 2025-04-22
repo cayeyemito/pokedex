@@ -46,6 +46,7 @@ let formasArrayId = [];
 let esImportante = false;
 let idForma = -1
 let hasChanged = false
+let overlayNotTouch = document.getElementById("notTouch")
 const pokemonTypes = [
     "normal",
     "fire",
@@ -67,15 +68,24 @@ const pokemonTypes = [
     "fairy"
 ];
 let arrayFiltroId = []
+let idPokemonFilter = 0
+let hasFilter = false
+let filterTypeNew = ""
+let filterTypeOld = ""
+let filterScreen = document.getElementById("filtrador")
 
 async function initialize(numberPokedex) {
+
 
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    if(!pokemonEspecialForm){
+    if(!pokemonEspecialForm && !hasFilter){
         pokemon = await getPokemonInfo(id);
+        getForms()
+    } else if(hasFilter && !pokemonEspecialForm){
+        pokemon = await getPokemonInfo(numberPokedex);
         getForms()
     } else {
         pokemon = await getSpecialPokemonInfo(numberPokedex);
@@ -152,7 +162,7 @@ async function initialize(numberPokedex) {
     
     innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
     innerScreen.style.backgroundImage = `url("img/tipos/${pokemon.tipo}/${pokemon.tipo}.jpg")`
-    pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+    pokeNameIdText.innerText = `${pokemon.numero_pokedex} ${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
     
     createEvolutionChain()
 
@@ -254,24 +264,23 @@ async function initialize(numberPokedex) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Escucha los cambios de tamaño y de orientación
+
     window.addEventListener("resize", checkLandscape);
     window.addEventListener("orientationchange", checkLandscape);
 
-    // Llama a la función al cargar la página para detectar la orientación inicial
     checkLandscape();
 
     const blueButton = document.querySelector(".blue-button");
-    blueButton.classList.add("parpadeando"); // Comienza a parpadear
+    blueButton.classList.add("parpadeando");
+    overlayNotTouch.style.display = "flex"
 
     initialize(id).finally(() => {
-        blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
+        blueButton.classList.remove("parpadeando")
+        overlayNotTouch.style.display = "none"
     });
 });
 
 function showGuide(){
-    let innerScreen = document.getElementById("inner-screen")
-    let innerScreenOverlay = document.getElementById("inner-screen-overlay")
     let guideScreen = document.getElementById("guide-screen")
 
     if(!guideChanged){
@@ -288,15 +297,15 @@ function showGuide(){
 }
 
 function showFilter(){
-    let innerScreen = document.getElementById("inner-screen")
-    let innerScreenOverlay = document.getElementById("inner-screen-overlay")
-    let filterScreen = document.getElementById("filtrador")
 
     if(!guideChanged){
         innerScreen.style.filter = "blur(1.5rem)"
         innerScreenOverlay.style.visibility = "blur(1.5rem)"
         filterScreen.style.visibility = "visible"
         filterScreen.innerHTML = ""
+        filterScreen.innerHTML = `<div class="tipo-container-filter-title">
+                                        <h1 class="title-filtros-text">Tipos</h1>
+                                </div>`
         for(let i=0; i<pokemonTypes.length-1;i++){
             filterScreen.innerHTML += `<div class="tipo-container-filter">
                                         <img src="img/iconos_tipos/Icon_${pokemonTypes[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${pokemonTypes[i]}')">
@@ -312,6 +321,33 @@ function showFilter(){
 }
 
 async function establecerFiltro(tipo){
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando");
+    overlayNotTouch.style.display = "flex"
+    filterTypeNew = tipo
+    if(!hasFilter && filterTypeOld != filterTypeNew){
+        hasFilter = true
+        filterTypeOld = filterTypeNew
+    } else {
+        if(filterTypeNew === filterTypeOld){
+            hasFilter = false
+            idPokemonFilter  = 0
+            filterTypeOld = ""
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            innerScreen.style.filter = "blur(0)"
+            innerScreenOverlay.style.visibility = "blur(0)"
+            filterScreen.style.visibility = "hidden"
+            arrayFiltroId = []
+            return;
+        } else {
+            filterTypeOld = filterTypeNew
+            arrayFiltroId = []
+            idPokemonFilter = 0
+        }
+    }
     try {
         // Crea el cuerpo de la solicitud con el número de Pokémon  // Aquí deberías pasar el número que deseas buscar
         const bodyData = new URLSearchParams();
@@ -335,10 +371,9 @@ async function establecerFiltro(tipo){
         // Intenta parsear la respuesta JSON
         const data = JSON.parse(text);
     
-        // Verifica si la respuesta es correcta
         if (data.status === "success") {
             arrayFiltroId = data.data
-            console.log(arrayFiltroId)
+            arrayFiltroId.sort((a, b) => a.numero_pokedex - b.numero_pokedex);
         } else {
             console.warn("No se encontró el Pokémon:", data.message);
         }
@@ -346,6 +381,13 @@ async function establecerFiltro(tipo){
     } catch (error) {
         console.error("Error al obtener datos:", error);
     }
+    initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+        blueButton.classList.remove("parpadeando")
+        overlayNotTouch.style.display = "none"
+    });
+    innerScreen.style.filter = "blur(0)"
+    innerScreenOverlay.style.visibility = "blur(0)"
+    filterScreen.style.visibility = "hidden"
 }
 
 function showShiny(){
@@ -458,25 +500,83 @@ function searchPokemonInput(number){
 
 function searchPokemon(){
     let numberToTry = document.getElementById("pokemon-name-text").innerText
-    id = parseInt(numberToTry);
-    
-    if(id!=0){
-        resetAll()
-        const blueButton = document.querySelector(".blue-button");
-        blueButton.classList.add("parpadeando");
+    if(!hasFilter){
+        id = parseInt(numberToTry);
+        if(id!=0){
+            overlayNotTouch.style.display = "flex"
+            resetAll()
+            const blueButton = document.querySelector(".blue-button")
+            blueButton.classList.add("parpadeando");
 
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando");
-        });
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        } else {
+            pokeNameIdText.innerText = "ERROR";
+            pokeNameIdText.classList.add("blink");
+
+            setTimeout(() => {
+            pokeNameIdText.classList.remove("blink");
+            pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+            }, 3000);
+        }
     } else {
-        pokeNameIdText.innerText = "ERROR";
-        pokeNameIdText.classList.add("blink");
+        let idFilter = parseInt(numberToTry);
+        if(idFilter!=0){
+            overlayNotTouch.style.display = "flex"
+            resetAll()
+            const blueButton = document.querySelector(".blue-button")
+            blueButton.classList.add("parpadeando");
 
-        setTimeout(() => {
-        pokeNameIdText.classList.remove("blink");
-        pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
-        }, 3000);
-    }
+            let encontrado = false;
+
+
+            for (let i = 0; i < arrayFiltroId.length; i++) {
+                if (idFilter == arrayFiltroId[i].numero_pokedex) {
+                    idPokemonFilter = i
+                    initialize(arrayFiltroId[i].numero_pokedex).finally(() => {
+                        blueButton.classList.remove("parpadeando");
+                        overlayNotTouch.style.display = "none";
+                    });
+                    return
+                }
+            }
+
+            if (!encontrado) {
+                // Buscar el índice del valor más cercano
+                let closestIndex = 0;
+                let minDiff = Math.abs(idFilter - arrayFiltroId[0].numero_pokedex);
+
+                for (let i = 1; i < arrayFiltroId.length; i++) {
+                    let currentDiff = Math.abs(idFilter - arrayFiltroId[i].numero_pokedex);
+
+                    if (
+                        currentDiff < minDiff ||
+                        (currentDiff === minDiff && arrayFiltroId[i].numero_pokedex > arrayFiltroId[closestIndex].numero_pokedex)
+                    ) {
+                        minDiff = currentDiff;
+                        closestIndex = i;
+                    }
+                }
+
+                idPokemonFilter = closestIndex; // Guardamos la posición del valor más cercano
+
+                initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+                    blueButton.classList.remove("parpadeando");
+                    overlayNotTouch.style.display = "none";
+                });
+            }
+        } else {
+            pokeNameIdText.innerText = "ERROR";
+            pokeNameIdText.classList.add("blink");
+
+            setTimeout(() => {
+            pokeNameIdText.classList.remove("blink");
+            pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+            }, 3000);
+        }
+    }        
 }
 
 function deleteLastNumber(){
@@ -682,17 +782,36 @@ function reproSoundCry(){
 function nextPokemon(){
     resetAll()
     const blueButton = document.querySelector(".blue-button");
-    blueButton.classList.add("parpadeando"); // Comienza a parpadear
-    if(id<1025){
-        id++
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
-        });
-    } else{
-        id = 1
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
-        });
+    blueButton.classList.add("parpadeando");
+    overlayNotTouch.style.display = "flex"
+    if(!hasFilter){
+        if(id<1025){
+            id++
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        } else{
+            id = 1
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        }
+    } else {
+        if(idPokemonFilter < arrayFiltroId.length-1){
+            idPokemonFilter++
+            initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        } else {
+            idPokemonFilter = 0
+            initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        }
     }
 }
 
@@ -709,21 +828,43 @@ function resetAll(){
 function previousPokemon(){
     resetAll()
     const blueButton = document.querySelector(".blue-button");
-    blueButton.classList.add("parpadeando"); // Comienza a parpadear
-    if(id>1){
-        id--
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
-        });
-    } else{
-        id = 1025
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando"); // Deja de parpadear cuando termine
-        });
+    blueButton.classList.add("parpadeando"); 
+    overlayNotTouch.style.display = "flex"
+    if(!hasFilter){
+        if(id>1){
+            id--
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        } else{
+            id = 1025
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        }
+    } else {
+        if(idPokemonFilter>0){
+            idPokemonFilter--
+            initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        } else {
+            idPokemonFilter = arrayFiltroId.length-1
+            initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+        }
     }
 }
 
 function passNextForm(){
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); 
+    overlayNotTouch.style.display = "flex"
     if(!hasChanged){
         pokemonOriginal = pokemon
         hasChanged = true
@@ -731,16 +872,24 @@ function passNextForm(){
     pokemonEspecialForm = true;
     if(idForma<formasArrayId.length-1){
         idForma++
-        initialize(formasArrayId[idForma])
+        initialize(formasArrayId[idForma]).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
     } else{
         pokemonEspecialForm = false
-        initialize(id)
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
         idForma = -1
     }
-    console.log(idForma)
 }
 
 function passPreviousForm(){
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); 
+    overlayNotTouch.style.display = "flex"
     if(!hasChanged){
         pokemonOriginal = pokemon
         hasChanged = true
@@ -749,17 +898,25 @@ function passPreviousForm(){
 
     if(idForma>0){
         idForma--
-        initialize(formasArrayId[idForma])
+        initialize(formasArrayId[idForma]).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
     } else if(idForma > -1){
         idForma = -1;
         pokemonEspecialForm = false
-        initialize(id)
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
     } 
     else{
         idForma = formasArrayId.length-1
-        initialize(formasArrayId[idForma])
+        initialize(formasArrayId[idForma]).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
     }
-    console.log(idForma)
 }
 
 async function passNextAttack() {
@@ -1306,16 +1463,24 @@ function startMegaEvo(newId) {
 }
 
 function toggleFormaRegional(newId) {
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); 
     const goingToForm = !isFormaAlterna;
     isFormaAlterna = goingToForm;
-
+    overlayNotTouch.style.display = "flex"
     if (goingToForm) {
         pokemonOriginal = pokemon;
         pokemonEspecialForm = true;
-        initialize(newId);
+        initialize(newId).finally(() => {
+            blueButton.classList.remove("parpadeando");
+            overlayNotTouch.style.display = "none"
+        });
     } else {
         pokemonEspecialForm = false;
-        initialize(id); // id debe ser el ID original del Pokémon
+        initialize(id).finally(() => {
+            blueButton.classList.remove("parpadeando");
+            overlayNotTouch.style.display = "none"
+        });
     }
 }
 
@@ -1349,10 +1514,14 @@ async function toggleForm({
     const container = document.getElementById("megaContainer");
     const screen2 = document.getElementById(screen2Id);
     const anim2 = document.getElementById(anim2Id);
+    const blueButton = document.querySelector(".blue-button");
+    blueButton.classList.add("parpadeando"); 
+    overlayNotTouch.style.display = "flex"
 
     // Mostrar pantalla de animación
     screen.style.display = 'flex';
     screen.classList.add('active');
+
 
     // Reiniciar animaciones (forzar reflow)
     anim.classList.remove('mega-animation');
@@ -1393,6 +1562,8 @@ async function toggleForm({
             screen2.classList.remove('active');
             screen2.style.display = 'none';
             anim2.classList.remove('smooth');
+            blueButton.classList.remove("parpadeando");
+            overlayNotTouch.style.display = "none"
         });
     }, { once: true });
 }

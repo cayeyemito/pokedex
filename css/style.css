@@ -494,10 +494,26 @@ body {
 }
 
 @keyframes glowEffect {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+        filter: blur(20px);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(30px);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(30px);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5); /* antes era 2 */
+        filter: blur(30px);
+    }
 }
 
 @keyframes glowEffect2 {
@@ -1776,6 +1792,19 @@ body {
     justify-content: center;
 }
 
+.tipo-container-filter-title{
+    position: relative;
+    width: 100%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-filtros-text{
+    font-size: clamp(1vh,4vh,4.5vh);
+}
+
 .flex {
     display: flex;
     flex-wrap: wrap;
@@ -1790,4 +1819,15 @@ body {
 .iconos_tipos2:active{
     filter: brightness(70%);
     transform: scale(0.6);
+}
+
+.overlayNotTouch{
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    opacity: 0;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    display: none;
 }

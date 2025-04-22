@@ -81,11 +81,22 @@ if(isset($_REQUEST["numero"])){
 
     $stmt->close();
     $conn->close();
-} else if(isset($_REQUEST["tipo"])){
+} elseif (isset($_REQUEST["tipo"])) {
+    $tipo = $_REQUEST["tipo"]; // ✅ Corregido
 
-    $tipo = $_REQUEST["numero"];
+    if ($conn->connect_error) {
+        http_response_code(500);
+        $response = [
+            "status" => "error",
+            "message" => "Error de conexión a la base de datos"
+        ];
+        echo json_encode($response);
+        exit();
+    }
 
-    $stmt = $conn->prepare("SELECT numero_pokedex FROM pokemon_all_info WHERE tipo like ? or tipo_secundario like ?");
+    $tipoLike = "%" . $tipo . "%"; // Para usar con LIKE
+
+    $stmt = $conn->prepare("SELECT numero_pokedex FROM pokemon_all_info WHERE tipo LIKE ? OR tipo_secundario LIKE ?");
     if (!$stmt) {
         http_response_code(500);
         $response = [
@@ -96,21 +107,46 @@ if(isset($_REQUEST["numero"])){
         exit();
     }
 
+    $stmt->bind_param("ss", $tipoLike, $tipoLike);
+    if (!$stmt->execute()) {
+        http_response_code(500);
+        $response = [
+            "status" => "error",
+            "message" => "Error al ejecutar consulta: " . $stmt->error
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
     $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $pokemon = $result->fetch_assoc();
+    $pokemons = [];
+    while ($row = $result->fetch_assoc()) {
+        $pokemons[] = $row;
+    }
+
+    if (count($pokemons) > 0) {
         $response = [
             "status" => "success",
-            "data" => $pokemon
+            "data" => $pokemons
         ];
     } else {
         http_response_code(404);
         $response = [
             "status" => "error",
-            "message" => "Pokémon no encontrado"
+            "message" => "No se encontraron Pokémon con ese tipo"
         ];
     }
+
+    $stmt->close();
+    $conn->close();
+} else {
+    http_response_code(400);
+    $response = [
+        "status" => "error",
+        "message" => "Falta parámetro 'numero' o 'tipo'"
+    ];
+
 }
 
 echo json_encode($response);
