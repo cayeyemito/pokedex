@@ -117,7 +117,6 @@ async function fetchAbility(id) {
       movimientos: movesList,
       especies: filteredResults
     };
-
     
     return ability; // Devuelve el objeto con los datos de la habilidad
   } catch (error) {
@@ -128,7 +127,7 @@ async function fetchAbility(id) {
 
 // Función para enviar las habilidades al servidor
 async function sendAbilitiesToServer() {
-    /*try {
+    try {
       const response = await fetch("./php/api.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -142,7 +141,7 @@ async function sendAbilitiesToServer() {
       abilities = [];
     } catch (error) {
       console.error("Error en la solicitud POST:", error);
-    }*/
+    }
   }
   
 

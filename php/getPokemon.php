@@ -40,7 +40,6 @@ if(isset($_REQUEST["numero"])){
         exit();
     }
 
-    // Usar WHERE en lugar de HAVING
     $stmt = $conn->prepare("SELECT * FROM pokemon_all_info HAVING numero_pokedex = ?");
     if (!$stmt) {
         http_response_code(500);
