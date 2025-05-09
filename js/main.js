@@ -112,12 +112,10 @@ async function initialize(numberPokedex) {
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
                                         <img src="img/kyogrePrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
                                     </div>`
-
         } else if(isMega && pokemon.nombre.includes("groudon-primal")){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
                                         <img src="img/groudonPrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
                                     </div>`
-
         } else if(isGigamax){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
                                         <img src="img/gigamax.png" class="mega-evolution-icon" onclick="startGigamax(${id})">
@@ -839,6 +837,7 @@ function resetAll(){
     idAbility = 0
     idForma = -1
     formasArrayId = []
+    formasArray = []
     hasChanged = false
 }
 
@@ -1350,6 +1349,7 @@ function getForms(){
                 else y = i;
 
             } else if (forma.includes("gmax")) {
+                console.log()
                 gmax = i;
                 esImportante = true;
                 recorte = true;
@@ -1655,7 +1655,6 @@ async function toggleForm({
         screen2.style.display = 'flex';
         screen2.classList.add('active');
     }, 2500);
-
     anim.addEventListener("animationend", function () {
         clearTimeout(screen2Timeout);
         initialize(targetId).finally(() => {
