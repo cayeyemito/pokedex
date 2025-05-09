@@ -8,6 +8,7 @@ let stat2 = document.getElementById("stat2")
 let stat3 = document.getElementById("stat3")
 let stat4 = document.getElementById("stat4")
 let stat5 = document.getElementById("stat5")
+let stat6 = document.getElementById("stat6")
 let statsScreen = document.getElementById("statScreen")
 let movementScreen = document.getElementById("movementScreen")
 let infoScreen = document.getElementById("infoScreen")
@@ -20,6 +21,7 @@ let pokeNameIdText = document.getElementById("pokemon-name-text")
 let pokemonScreenGlass = document.getElementById("inner-screen-overlay-glass")
 let abilityContainer = document.getElementById("abilityContainer")
 let basicInfoContainer = document.getElementById("basicInfo")
+let typeScreen = document.getElementById("typeScreen")
 let chartInstance;
 let habilidades
 let movimientos = {
@@ -169,6 +171,8 @@ async function initialize(numberPokedex) {
     habilidades = await getAllAbilities()
     habilidades.sort((a, b) => a.oculta - b.oculta);
     createAbiltyInfo()
+
+    createTypesInfo()
 
     if (pokemon) {
         const pokemonStats = {
@@ -439,22 +443,28 @@ function passNextStat() {
         stat5.style.transform = "scale(1.3)"
         stat4.style.transform = "scale(1)"
         stat++
-    } else {
-        infoScreen.style.visibility = "visible"
+    } else if (stat === 5){
         abilityScreen.style.visibility = "hidden"
-        stat1.style.transform = "scale(1.3)"
+        typeScreen.style.visibility = "visible"
         stat5.style.transform = "scale(1)"
+        stat6.style.transform = "scale(1.3)"
+        stat++
+    } else {
+        typeScreen.style.visibility = "hidden"
+        infoScreen.style.visibility = "visible"
+        stat1.style.transform = "scale(1.3)"
+        stat6.style.transform = "scale(1)"
         stat=1
     }
 }
 
 function passPreviousStat() {
     if(stat === 1){
-        abilityScreen.style.visibility = "visible"
+        typeScreen.style.visibility = "visible"
         infoScreen.style.visibility = "hidden"
-        stat5.style.transform = "scale(1.3)" 
+        stat6.style.transform = "scale(1.3)" 
         stat1.style.transform = "scale(1)"
-        stat = 5
+        stat = 6
     } else if (stat === 2){
         statsScreen.style.visibility = "hidden"
         infoScreen.style.visibility = "visible"
@@ -473,11 +483,18 @@ function passPreviousStat() {
         stat3.style.transform = "scale(1.3)"
         stat4.style.transform = "scale(1)"
         stat--
-    } else {
+    } else if (stat === 5){
         abilityScreen.style.visibility = "hidden"
         evolutionScreen.style.visibility = "visible"
         stat4.style.transform = "scale(1.3)"
         stat5.style.transform = "scale(1)"
+        stat--
+    } 
+    else {
+        typeScreen.style.visibility = "hidden"
+        abilityScreen.style.visibility = "visible"
+        stat5.style.transform = "scale(1.3)"
+        stat6.style.transform = "scale(1)"
         stat--
     }
 }
@@ -1216,6 +1233,93 @@ function createAbiltyInfo(){
                                     <div class="middle-container-movements">
                                         <h1 class="movement-description-text">${habilidades[idAbility].descripcion}</h1>
                                 </div>`
+}
+
+async function createTypesInfo(){
+    const bodyData = new URLSearchParams();
+    bodyData.append('tipo1', pokemon.tipo);
+    bodyData.append('tipo2', pokemon.tipo_secundario);
+
+    console.log("Enviando: ", bodyData.toString());  // Ver qué se está enviando realmente
+
+    // Realiza la solicitud POST
+    const response = await fetch("../php/getFunctions.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: bodyData.toString()
+    });
+
+    // Obtiene la respuesta como texto
+    const text = await response.text();
+
+    const resultado = JSON.parse(text); // text es el JSON recibido del fetch
+    const key = Object.keys(resultado[0])[0]; // Extraemos la única clave
+    const texto = resultado[0][key]; // El contenido de efectividades
+
+    const lineas = texto.split('\n');
+    const efectividades = {};
+
+    lineas.forEach(linea => {
+    const [tipo, valores] = linea.split(':');
+    if (tipo && valores) {
+            efectividades[tipo.trim()] = valores.split(',').map(v => v.trim());
+        }
+    });
+
+    for (const categoria in efectividades) {
+        efectividades[categoria] = efectividades[categoria].map(e => e.toLowerCase());
+    }
+
+    let textSuperE = "";
+    let textDebil = "";
+    let textNeutro = "";
+    let textInmune = "";
+
+    // Supereficaz
+    if (efectividades.superdebil && efectividades.superdebil.length > 0) {
+        textSuperE += `<h3 class="typeText">Supereficaz: `;
+        for (let i = 0; i < efectividades.superdebil.length; i++) {
+            textSuperE += `<img src="img/iconos_tipos/Icon_${efectividades.superdebil[i]}.webp" class="iconTypeStat">`;
+        }
+        textSuperE += `</h3>`;
+    }
+
+    // Eficaz (débil)
+    if (efectividades.debil && efectividades.debil.length > 0) {
+        textDebil += `<h3 class="typeText">Eficaz: `;
+        for (let i = 0; i < efectividades.debil.length; i++) {
+            textDebil += `<img src="img/iconos_tipos/Icon_${efectividades.debil[i]}.webp" class="iconTypeStat">`;
+        }
+        textDebil += `</h3>`;
+    }
+
+    // Neutro
+    if (efectividades.neutro && efectividades.neutro.length > 0) {
+        textNeutro += `<h3 class="typeText">Neutro: `;
+        for (let i = 0; i < efectividades.neutro.length; i++) {
+            textNeutro += `<img src="img/iconos_tipos/Icon_${efectividades.neutro[i]}.webp" class="iconTypeStat">`;
+        }
+        textNeutro += `</h3>`;
+    }
+
+    // Inmune
+    if (efectividades.inmune && efectividades.inmune.length > 0) {
+        textInmune += `<h3 class="typeText">Inmune: `;
+        for (let i = 0; i < efectividades.inmune.length; i++) {
+            textInmune += `<img src="img/iconos_tipos/Icon_${efectividades.inmune[i]}.webp" class="iconTypeStat">`;
+        }
+        textInmune += `</h3>`;
+    }
+
+    typeScreen.innerHTML = `<div class="typeSection">
+        ${textSuperE}
+        ${textDebil}
+        ${textNeutro}
+        ${textInmune}
+    </div>`;
+
 }
 
 function getForms(){

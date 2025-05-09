@@ -1046,6 +1046,15 @@ body {
     align-items: center;
 }
 
+.pokemon-types-container{
+    position: absolute;
+    height: 100%; 
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    margin-left: 2vw;
+}
+
 .basic-info-container, .ability-container{
     position: relative;
     height: 100%;
@@ -1174,7 +1183,7 @@ body {
     width: 47% !important;
 }
 
-.pokemon-movements-container, .pokemon-stats-chart-container, .pokemon-evolution-container, .pokemon-abilities-container{
+.pokemon-movements-container, .pokemon-stats-chart-container, .pokemon-evolution-container, .pokemon-abilities-container, .pokemon-types-container{
     visibility: hidden;
 }
 
@@ -1830,4 +1839,22 @@ body {
     top: 0%;
     left: 0%;
     display: none;
+}
+
+.typeText{
+    font-size: clamp(0.5rem, 1.3vw, 1.3rem);
+    font-family: 'retro', sans-serif;
+    color: white;
+}
+
+.typeSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7vh;
+}
+
+.iconTypeStat{
+    width: 1.1vw;
+    aspect-ratio: 1;
+    margin-right: 0.2;
 }
