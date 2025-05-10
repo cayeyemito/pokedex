@@ -136,7 +136,7 @@ if (isset($_REQUEST["habilidad"])) {
     $pokemons = [];
 
     foreach ($numeros as $numero) {
-        $stmt = $conn->prepare("SELECT id, imagen FROM Pokemon WHERE id = ?");
+        $stmt = $conn->prepare("CALL GetPokemonImagen(?)");
     
         if (!$stmt) {
             http_response_code(500);

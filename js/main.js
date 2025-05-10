@@ -1,7 +1,7 @@
 let guideChanged = false
 let shinyChanged = false
 let backgroundChanged = false
-let = isOn = true
+let isOn = true
 let stat = 1
 let stat1 = document.getElementById("stat1")
 let stat2 = document.getElementById("stat2")
@@ -9,6 +9,9 @@ let stat3 = document.getElementById("stat3")
 let stat4 = document.getElementById("stat4")
 let stat5 = document.getElementById("stat5")
 let stat6 = document.getElementById("stat6")
+let stat7 = document.getElementById("stat7")
+let listScreen = document.getElementById("listScreen")
+let listScreen2 = document.getElementById("listScreen2")
 let statsScreen = document.getElementById("statScreen")
 let movementScreen = document.getElementById("movementScreen")
 let infoScreen = document.getElementById("infoScreen")
@@ -75,9 +78,9 @@ let hasFilter = false
 let filterTypeNew = ""
 let filterTypeOld = ""
 let filterScreen = document.getElementById("filtrador")
+let urshifu
 
 async function initialize(numberPokedex) {
-
 
     if (chartInstance) {
         chartInstance.destroy();
@@ -154,6 +157,18 @@ async function initialize(numberPokedex) {
                                             passNextForm()">
                                     </div>`
         }
+        if(pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax")){
+            formsScreen.innerHTML = ""
+            getForms()
+        }
+        if(pokemon.nombre.includes("rapid-strike-gmax")){
+            idForma = -1
+        }
+    }
+
+    if(pokemon.nombre.includes("Urshifu") && !pokemon.nombre.includes("gmax") && !pokemon.nombre.includes("rapid-strike")){
+        console.log("Urshifu")
+        urshifu = pokemon
     }
 
     showMovementsOptions(0)
@@ -162,7 +177,7 @@ async function initialize(numberPokedex) {
     
     innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
     innerScreen.style.backgroundImage = `url("img/tipos/${pokemon.tipo}/${pokemon.tipo}.jpg")`
-    pokeNameIdText.innerText = `${pokemon.numero_pokedex} ${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
+    pokeNameIdText.innerText = `${pokemon.nombre_region.charAt(0).toUpperCase() + pokemon.nombre_region.slice(1).toLowerCase()}`
     
     createEvolutionChain()
 
@@ -171,6 +186,8 @@ async function initialize(numberPokedex) {
     createAbiltyInfo()
 
     createTypesInfo()
+
+    createList()
 
     if (pokemon) {
         const pokemonStats = {
@@ -417,83 +434,99 @@ function changeBackground(){
 }
 
 function passNextStat() {
-    if(stat === 1){
-        statsScreen.style.visibility = "visible"
-        infoScreen.style.visibility = "hidden"
-        stat2.style.transform = "scale(1.3)" 
-        stat1.style.transform = "scale(1)"
-        stat++
-    } else if (stat === 2){
-        statsScreen.style.visibility = "hidden"
-        movementScreen.style.visibility = "visible"
-        stat3.style.transform = "scale(1.3)"
-        stat2.style.transform = "scale(1)"
-        stat++
-    } else if (stat === 3){
-        evolutionScreen.style.visibility = "visible"
-        movementScreen.style.visibility = "hidden"
-        stat4.style.transform = "scale(1.3)"
-        stat3.style.transform = "scale(1)"
-        stat++
-    } else if (stat === 4){
-        abilityScreen.style.visibility = "visible"
-        evolutionScreen.style.visibility = "hidden"
-        stat5.style.transform = "scale(1.3)"
-        stat4.style.transform = "scale(1)"
-        stat++
-    } else if (stat === 5){
-        abilityScreen.style.visibility = "hidden"
-        typeScreen.style.visibility = "visible"
-        stat5.style.transform = "scale(1)"
-        stat6.style.transform = "scale(1.3)"
-        stat++
+    if (stat === 1) {
+        statsScreen.style.visibility = "visible";
+        infoScreen.style.visibility = "hidden";
+        stat2.style.transform = "scale(1.3)";
+        stat1.style.transform = "scale(1)";
+        stat++;
+    } else if (stat === 2) {
+        statsScreen.style.visibility = "hidden";
+        movementScreen.style.visibility = "visible";
+        stat3.style.transform = "scale(1.3)";
+        stat2.style.transform = "scale(1)";
+        stat++;
+    } else if (stat === 3) {
+        evolutionScreen.style.visibility = "visible";
+        movementScreen.style.visibility = "hidden";
+        stat4.style.transform = "scale(1.3)";
+        stat3.style.transform = "scale(1)";
+        stat++;
+    } else if (stat === 4) {
+        abilityScreen.style.visibility = "visible";
+        evolutionScreen.style.visibility = "hidden";
+        stat5.style.transform = "scale(1.3)";
+        stat4.style.transform = "scale(1)";
+        stat++;
+    } else if (stat === 5) {
+        abilityScreen.style.visibility = "hidden";
+        typeScreen.style.visibility = "visible";
+        stat6.style.transform = "scale(1.3)";
+        stat5.style.transform = "scale(1)";
+        stat++;
+    } else if (stat === 6) {
+        typeScreen.style.visibility = "hidden";
+        listScreen2.classList.remove('hidden');
+        listScreen2.style.visibility = "visible";
+        stat7.style.transform = "scale(1.3)";
+        stat6.style.transform = "scale(1)";
+        stat++;
     } else {
-        typeScreen.style.visibility = "hidden"
-        infoScreen.style.visibility = "visible"
-        stat1.style.transform = "scale(1.3)"
-        stat6.style.transform = "scale(1)"
-        stat=1
+        listScreen2.classList.add('hidden');
+        listScreen2.style.visibility = "hidden";
+        infoScreen.style.visibility = "visible";
+        stat1.style.transform = "scale(1.3)";
+        stat7.style.transform = "scale(1)";
+        stat = 1;
     }
+    
 }
 
 function passPreviousStat() {
-    if(stat === 1){
-        typeScreen.style.visibility = "visible"
-        infoScreen.style.visibility = "hidden"
-        stat6.style.transform = "scale(1.3)" 
-        stat1.style.transform = "scale(1)"
-        stat = 6
-    } else if (stat === 2){
-        statsScreen.style.visibility = "hidden"
-        infoScreen.style.visibility = "visible"
-        stat1.style.transform = "scale(1.3)"
-        stat2.style.transform = "scale(1)"
-        stat--
-    } else if (stat === 3){
-        statsScreen.style.visibility = "visible"
-        movementScreen.style.visibility = "hidden"
-        stat2.style.transform = "scale(1.3)"
-        stat3.style.transform = "scale(1)"
-        stat--
-    } else if (stat === 4){
-        movementScreen.style.visibility = "visible"
-        evolutionScreen.style.visibility = "hidden"
-        stat3.style.transform = "scale(1.3)"
-        stat4.style.transform = "scale(1)"
-        stat--
-    } else if (stat === 5){
-        abilityScreen.style.visibility = "hidden"
-        evolutionScreen.style.visibility = "visible"
-        stat4.style.transform = "scale(1.3)"
-        stat5.style.transform = "scale(1)"
-        stat--
-    } 
-    else {
-        typeScreen.style.visibility = "hidden"
-        abilityScreen.style.visibility = "visible"
-        stat5.style.transform = "scale(1.3)"
-        stat6.style.transform = "scale(1)"
-        stat--
+    if (stat === 1) {
+        listScreen2.classList.remove('hidden');
+        listScreen2.style.visibility = "visible";
+        infoScreen.style.visibility = "hidden";
+        stat7.style.transform = "scale(1.3)";
+        stat1.style.transform = "scale(1)";
+        stat = 7;
+    } else if (stat === 2) {
+        statsScreen.style.visibility = "hidden";
+        infoScreen.style.visibility = "visible";
+        stat1.style.transform = "scale(1.3)";
+        stat2.style.transform = "scale(1)";
+        stat--;
+    } else if (stat === 3) {
+        statsScreen.style.visibility = "visible";
+        movementScreen.style.visibility = "hidden";
+        stat2.style.transform = "scale(1.3)";
+        stat3.style.transform = "scale(1)";
+        stat--;
+    } else if (stat === 4) {
+        movementScreen.style.visibility = "visible";
+        evolutionScreen.style.visibility = "hidden";
+        stat3.style.transform = "scale(1.3)";
+        stat4.style.transform = "scale(1)";
+        stat--;
+    } else if (stat === 5) {
+        evolutionScreen.style.visibility = "visible";
+        abilityScreen.style.visibility = "hidden";
+        stat4.style.transform = "scale(1.3)";
+        stat5.style.transform = "scale(1)";
+        stat--;
+    } else if (stat === 6) {
+        abilityScreen.style.visibility = "visible";
+        typeScreen.style.visibility = "hidden";
+        stat5.style.transform = "scale(1.3)";
+        stat6.style.transform = "scale(1)";
+        stat--;
+    } else {
+        typeScreen.style.visibility = "visible";
+        listScreen2.classList.add('hidden');
+        listScreen2.style.visibility = "hidden";
+        stat6.style.transform = "scale(1.3)";
+        stat7.style.transform = "scale(1)";
+        stat--;
     }
 }
 
@@ -1133,11 +1166,17 @@ function createBasicInfo(){
     const nombre = pokemon.nombre
         .split("-")
         .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
-        .join(" ");  
+        .join(" ");
+        let idMotrada
+        if(pokemon.numero_pokedex<=1025){
+            idMotrada = "#" + pokemon.numero_pokedex;
+        } else{
+            idMotrada = "#" + pokemonOriginal.numero_pokedex;
+        }
 
     basicInfoContainer.innerHTML = `<div class="top-container-movements">
                                         <div class="movement-title-container ${widht}">
-                                            <h1 class="movement-name-text line-ability">${nombre}</h1>
+                                            <h1 class="movement-name-text line-ability">${nombre} ${idMotrada}</h1>
                                         </div>
                                         <div class="movement-type-container">
                                             <img src="img/iconos_tipos/Icon_${pokemon.tipo}.webp" class="icono-ataques-tipo">
@@ -1239,8 +1278,6 @@ async function createTypesInfo(){
     bodyData.append('tipo1', pokemon.tipo);
     bodyData.append('tipo2', pokemon.tipo_secundario);
 
-    console.log("Enviando: ", bodyData.toString());  // Ver qué se está enviando realmente
-
     // Realiza la solicitud POST
     const response = await fetch("../php/getFunctions.php", {
         method: "POST",
@@ -1275,6 +1312,8 @@ async function createTypesInfo(){
     let textDebil = "";
     let textNeutro = "";
     let textInmune = "";
+    let textResistente = "";
+    let textSuperResistente = "";
 
     // Supereficaz
     if (efectividades.superdebil && efectividades.superdebil.length > 0) {
@@ -1312,26 +1351,134 @@ async function createTypesInfo(){
         textInmune += `</h3>`;
     }
 
+    // Resistente
+    if (efectividades.resistente && efectividades.resistente.length > 0) {
+        textResistente += `<h3 class="typeText">Resistente: `;
+        for (let i = 0; i < efectividades.resistente.length; i++) {
+            textResistente += `<img src="img/iconos_tipos/Icon_${efectividades.resistente[i]}.webp" class="iconTypeStat">`;
+        }
+        textResistente += `</h3>`;
+    }
+
+    // Superresistente
+    if (efectividades.superresistente && efectividades.superresistente.length > 0) {
+        textSuperResistente += `<h3 class="typeText">Superresistente: `;
+        for (let i = 0; i < efectividades.superresistente.length; i++) {
+            textSuperResistente += `<img src="img/iconos_tipos/Icon_${efectividades.superresistente[i]}.webp" class="iconTypeStat">`;
+        }
+        textSuperResistente += `</h3>`;
+    }
+
     typeScreen.innerHTML = `<div class="typeSection">
         ${textSuperE}
         ${textDebil}
         ${textNeutro}
         ${textInmune}
+        ${textResistente}
+        ${textSuperResistente}
     </div>`;
-
 }
+
+let allPokemonsForTyping = [];
+
+// Función que dibuja la lista a partir de un array dado
+function renderList(pokemons) {
+    const container = document.getElementById('listScreen');
+    container.innerHTML = '';  
+
+    const ul = document.createElement('ul');
+    ul.id = 'pokemon-list';
+
+    pokemons.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'pokemon-item';
+        if (p.id === id) li.classList.add('highlight');
+        li.innerHTML = `
+        <img src="${p.image}" alt="${p.name}">
+        <span class="pokemon-name">${p.name}</span>
+        <span class="pokemon-id">#${p.id}</span>
+        `;
+
+        li.addEventListener('click', () => {
+            id = p.id;
+            resetAll()
+            const blueButton = document.querySelector(".blue-button");
+            blueButton.classList.add("parpadeando");
+            overlayNotTouch.style.display = "flex"
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            document.getElementById('filterInput').value = '';
+        });
+
+
+        ul.appendChild(li);
+    });
+
+    container.appendChild(ul);
+
+    // Auto-scroll al resaltado
+    const highlighted = ul.querySelector('.pokemon-item.highlight');
+    if (highlighted) {
+        highlighted.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }
+}
+
+// Carga inicial y guardado del array completo
+async function createList() {
+    try {
+        const resp = await fetch('../php/getAllPoke.php');
+        const json = await resp.json();
+        if (!json.success) throw new Error(json.error);
+
+        allPokemons = json.data;  
+        renderList(allPokemons);
+    } catch (e) {
+        console.error('Error al obtener/parsear Pokémon:', e);
+    }
+}
+
+// Filtrado en tiempo real
+document.getElementById('filterInput').addEventListener('input', e => {
+    let term = e.target.value.trim().toLowerCase().replace('#', '');
+
+    // Si es un número mayor a 1025, limitamos la búsqueda a '1025'
+    if (!isNaN(term) && Number(term) > 1025) {
+        term = '1025';
+    }
+
+    if (!term) {
+        renderList(allPokemons, null);
+        return;
+    }
+
+    const filtered = allPokemons.filter(p => {
+        return p.name.toLowerCase().includes(term)
+            || String(p.id).includes(term);
+    });
+
+    renderList(filtered, null);
+});
 
 function getForms(){
     let countMega = 0;
     let idMega = [];
     let x = 0, y = 0, mega = 0;
-    let gmax = null, paldea = null, alola = null, hisui = null, galar = null, kyogrePrimal = null, groudonPrimal = null;
-
-    if (pokemon.formaEspecial != null) {
-        formsScreen.innerHTML = "";
-        let formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
-        formasArrayIdSinRecortar = pokemon.formaEspecial.split(",").map(s => s.trim());
-        formasArrayId =pokemon.formaEspecial.split(",").map(s => s.trim());
+    let gmax = null, paldea = null, alola = null, hisui = null, galar = null, kyogrePrimal = null, groudonPrimal = null, gmaxUrshi1 = null, gmaxUrshi2 = null;
+    if (pokemon.formaEspecial != null || pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax")) {
+        let formasArrayNombre
+        if(pokemon.nombre.includes("rapid-strike")){
+            formasArrayNombre = pokemonOriginal.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
+            formasArrayIdSinRecortar = pokemonOriginal.formaEspecial.split(",").map(s => s.trim());
+            formasArrayId =pokemonOriginal.formaEspecial.split(",").map(s => s.trim());
+            formsScreen.innerHTML = "";
+        } else {
+            formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
+            formasArrayIdSinRecortar = pokemon.formaEspecial.split(",").map(s => s.trim());
+            formasArrayId =pokemon.formaEspecial.split(",").map(s => s.trim());
+            formsScreen.innerHTML = "";
+        }
         let recorte = false
 
         for (let i = 0, k = 0; i < formasArrayNombre.length; i++, k++) {
@@ -1349,8 +1496,13 @@ function getForms(){
                 else y = i;
 
             } else if (forma.includes("gmax")) {
-                console.log()
-                gmax = i;
+                if(forma.includes("single-strike-gmax")){
+                    gmaxUrshi1 = i;
+                }else if(forma.includes("rapid-strike-gmax")){
+                    gmaxUrshi2 = i;
+                }else{
+                    gmax = i;
+                }
                 esImportante = true;
                 recorte = true;
 
@@ -1359,17 +1511,16 @@ function getForms(){
                 esImportante = true;
                 recorte = true;
 
-            } else if (forma.includes("alola")) {
+            } else if (forma.includes("alola") && !forma.includes("totem") && !forma.includes("pikachu")) {
                 alola = i;
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("paldea")) {
                 paldea = i;
                 esImportante = true;
                 recorte = true;
 
-            } else if (forma.includes("galar")) {
+            } else if (forma.includes("galar") && !forma.includes("zen")) {
                 galar = i;
                 esImportante = true;
                 recorte = true;
@@ -1382,6 +1533,8 @@ function getForms(){
             } else if (forma.includes("groudon-primal")) {
                 groudonPrimal = i;
                 esImportante = true;
+                recorte = true; 
+            } else if (forma.includes("totem")) {
                 recorte = true;
             }
 
@@ -1406,9 +1559,22 @@ function getForms(){
                 </div>`;
         }
 
+        // Detectar forma actual para decidir qué gigamax mostrar
+        let gmaxActual = null;
+        console.log(pokemon.nombre)
+        if (pokemon.nombre.includes("rapid-strike")) {
+            gmaxActual = gmaxUrshi2;
+            console.log(gmaxActual)
+        } else if (pokemon.nombre.includes("Urshifu")) {
+            gmaxActual = gmaxUrshi1;
+            console.log(gmaxActual)
+        } else {
+            gmaxActual = gmax;
+        }
+
         // Formas especiales
         const formasEspeciales = [
-            { nombre: "gigamax", clase: "blanco", funcion: "startGigamax", index: gmax },
+            { nombre: "gigamax", clase: "blanco", funcion: "startGigamax", index: gmaxActual },
             { nombre: "alola", clase: "logo-sol-icono", funcion: "toggleFormaRegional", index: alola },
             { nombre: "hisui", clase: "logo-leyendas-icono", funcion: "toggleFormaRegional", index: hisui },
             { nombre: "paldea", clase: "logo-leyendas-icono", funcion: "toggleFormaRegional", index: paldea },
@@ -1456,7 +1622,7 @@ function getForms(){
                                     </div>`
         }
 
-    } else {
+    }else {
         formsScreen.innerHTML = "";
     }
 }
@@ -1480,7 +1646,6 @@ async function createEvolutionChain(){
         let ids = [];
         let metodos = [];
 
-        // Lógica para manejar las evoluciones
         if (evos.length === 5) {
             ids = [evos[0], evos[2], evos[4]];
             metodos = [evos[1], evos[3]]
@@ -1643,7 +1808,11 @@ async function toggleForm({
     setFormActive(goingToForm);
 
     if (goingToForm) {
-        pokemonOriginal = pokemon;
+        if(pokemon.nombre.includes("rapid-strike")){
+            pokemonOriginal = urshifu;
+        } else {
+            pokemonOriginal = pokemon;
+        }
         pokemonEspecialForm = true;
     } else {
         pokemonEspecialForm = false;
@@ -1707,3 +1876,14 @@ function checkLandscape() {
         }
     }
 }
+
+const filterInput = document.getElementById('filterInput');
+
+filterInput.addEventListener('input', () => {
+    const value = filterInput.value;
+
+    // Si es número y pasa de 1025 → lo recortamos
+    if (!isNaN(value) && Number(value) > 1025) {
+        filterInput.value = '1025';
+    }
+});
