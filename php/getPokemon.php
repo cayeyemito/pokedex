@@ -81,7 +81,7 @@ if(isset($_REQUEST["numero"])){
     $stmt->close();
     $conn->close();
 } elseif (isset($_REQUEST["tipo"])) {
-    $tipo = $_REQUEST["tipo"]; // ✅ Corregido
+    $tipo = $_REQUEST["tipo"];
 
     if ($conn->connect_error) {
         http_response_code(500);
@@ -95,7 +95,7 @@ if(isset($_REQUEST["numero"])){
 
     $tipoLike = "%" . $tipo . "%"; // Para usar con LIKE
 
-    $stmt = $conn->prepare("SELECT numero_pokedex FROM pokemon_all_info WHERE tipo LIKE ? OR tipo_secundario LIKE ?");
+    $stmt = $conn->prepare("CALL filtrarPorTipo(?)");
     if (!$stmt) {
         http_response_code(500);
         $response = [
@@ -106,7 +106,7 @@ if(isset($_REQUEST["numero"])){
         exit();
     }
 
-    $stmt->bind_param("ss", $tipoLike, $tipoLike);
+    $stmt->bind_param("s", $tipoLike);
     if (!$stmt->execute()) {
         http_response_code(500);
         $response = [
@@ -137,6 +137,140 @@ if(isset($_REQUEST["numero"])){
         ];
     }
 
+    $stmt->close();
+    $conn->close();
+} elseif (isset($_REQUEST["generacion"])) {
+    $generacion = $_REQUEST["generacion"]; // Valor recibido
+
+    if ($conn->connect_error) {
+        http_response_code(500);
+        $response = [
+            "status" => "error",
+            "message" => "Error de conexión a la base de datos"
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
+    $generacionLike = "%" . $generacion . "%"; // Para usar con LIKE
+
+    $stmt = $conn->prepare("CALL filtrarPorGeneracion(?)");
+    if (!$stmt) {
+        http_response_code(500);
+        $response = [
+            "status" => "error",
+            "message" => "Error en preparación de consulta: " . $conn->error
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
+    $stmt->bind_param("s", $generacionLike);
+    if (!$stmt->execute()) {
+        http_response_code(500);
+        $response = [
+            "status" => "error",
+            "message" => "Error al ejecutar consulta: " . $stmt->error
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
+    $result = $stmt->get_result();
+
+    $pokemons = [];
+    while ($row = $result->fetch_assoc()) {
+        $pokemons[] = $row;
+    }
+
+    if (count($pokemons) > 0) {
+        $response = [
+            "status" => "success",
+            "data" => $pokemons
+        ];
+    } else {
+        http_response_code(404);
+        $response = [
+            "status" => "error",
+            "message" => "No se encontraron Pokémon de esa generación"
+        ];
+    }
+
+    $stmt->close();
+    $conn->close();
+} elseif (isset($_REQUEST["altura_min"]) || isset($_REQUEST["peso_min"])) {
+
+    if ($conn->connect_error) {
+        http_response_code(500);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Error de conexión a la base de datos"
+        ]);
+        exit();
+    }
+
+    // Obtener los valores de los filtros
+    $alturaMin = $_REQUEST["altura_min"] ?? null;
+    $alturaMax = $_REQUEST["altura_max"] ?? null;
+    $pesoMin = $_REQUEST["peso_min"] ?? null;
+    $pesoMax = $_REQUEST["peso_max"] ?? null;
+
+    // Determinar qué tipo de filtro aplicar
+    if ($alturaMin !== null && $alturaMax !== null && $pesoMin === null && $pesoMax === null) {
+        // Solo filtro por altura
+        $stmt = $conn->prepare("CALL filtrarPorAltura(?, ?)");
+        $stmt->bind_param("dd", $alturaMin, $alturaMax);
+    } elseif ($pesoMin !== null && $pesoMax !== null && $alturaMin === null && $alturaMax === null) {
+        // Solo filtro por peso
+        $stmt = $conn->prepare("CALL filtrarPorPeso(?, ?)");
+        $stmt->bind_param("dd", $pesoMin, $pesoMax);
+    } elseif ($alturaMin !== null && $alturaMax !== null && $pesoMin !== null && $pesoMax !== null) {
+        // Ambos filtros a la vez
+        $stmt = $conn->prepare("CALL filtrarPorAlturaYPeso(?, ?, ?, ?)");
+        $stmt->bind_param("dddd", $alturaMin, $alturaMax, $pesoMin, $pesoMax);
+    } else {
+        http_response_code(400);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Parámetros insuficientes para aplicar el filtro"
+        ]);
+        exit();
+    }
+
+    // Ejecutar consulta y obtener resultados
+    if (!$stmt || !$stmt->execute()) {
+        http_response_code(500);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Error en consulta: " . ($stmt ? $stmt->error : $conn->error)
+        ]);
+        exit();
+    }
+
+    $result = $stmt->get_result();
+    $pokemons = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $pokemons[] = $row;
+    }
+
+    // Verificar si se encontraron resultados y devolver la respuesta
+    if (count($pokemons) > 0) {
+        echo json_encode([
+            "status" => "success",
+            "data" => $pokemons
+        ]);
+        exit; // <---- MUY IMPORTANTE
+    } else {
+        http_response_code(404);
+        echo json_encode([
+            "status" => "error",
+            "message" => "No se encontraron Pokémon con esos filtros"
+        ]);
+        exit; // <---- MUY IMPORTANTE
+    }
+
+    // Cerrar la consulta y la conexión
     $stmt->close();
     $conn->close();
 } else {

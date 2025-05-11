@@ -331,106 +331,236 @@ function showGuide(){
     }
 }
 
-function showFilter(){
-
+async function showFilter(){
     if(!guideChanged){
+        let limits = {};
+        overlayNotTouch.style.display = "flex";
+
+        filterScreen.style.visibility = "visible";
+        filterScreen.innerHTML = `
+            <div class="loader-overlay">
+                <div class="loader"></div>
+            </div>
+        `;
+
+        await fetch('../php/getLimits.php')
+        .then(r => r.json())
+        .then(json => {
+            limits = json;
+        }).catch(error => {
+        console.error("Error al obtener los límites:", error);
+        })
+        .finally(() => {
+            overlayNotTouch.style.display = "none"; // Ocultar overlay cuando termina la llamada
+        });
+        
         innerScreen.style.filter = "blur(1.5rem)"
         innerScreenOverlay.style.visibility = "blur(1.5rem)"
         filterScreen.style.visibility = "visible"
         filterScreen.innerHTML = ""
         filterScreen.innerHTML = `<div class="tipo-container-filter-title">
-                                        <h1 class="title-filtros-text">Tipos</h1>
-                                </div>`
-        for(let i=0; i<pokemonTypes.length;i++){
-            filterScreen.innerHTML += `<div class="tipo-container-filter">
-                                        <img src="img/iconos_tipos/Icon_${pokemonTypes[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${pokemonTypes[i]}')">
-                                    </div>`
-        }
+                                    <h1 class="title-filtros-text">Tipos</h1>
+                                </div>
+                                ${pokemonTypes.map(t => `
+                                    <div class="tipo-container-filter">
+                                    <img 
+                                        src="img/iconos_tipos/Icon_${t}.webp" 
+                                        class="iconos_tipos2" 
+                                        onclick="establecerFiltro('${t}')"
+                                    >
+                                    </div>
+                                `).join('')}
+
+                                <div class="tipo-container-filter-title">
+                                    <h1 class="title-filtros-text">Generación</h1>
+                                </div>
+                                ${generations.map(g => `
+                                    <div class="tipo-container-filter">
+                                    <img 
+                                        src="img/generaciones/${g}.webp" 
+                                        class="iconos_tipos2" 
+                                        onclick="establecerFiltro('${g}')"
+                                    >
+                                    </div>
+                                `).join('')}`
         filterScreen.innerHTML += `<div class="tipo-container-filter-title">
-                                        <h1 class="title-filtros-text">Generación</h1>
-                                </div>`
-        for(let i=0; i<generations.length;i++){
-            filterScreen.innerHTML += `<div class="tipo-container-filter">
-                                        <img src="img/generaciones/${generations[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${generations[i]}')">
-                                    </div>`
-        }
+                                        <h1 class="title-filtros-text">Altura (m)</h1>
+                                    </div>
+                                    <div class="slider-wrapper">
+                                        <div>
+                                            <div id="slider-altura"></div>
+                                            <div class="range-values">
+                                                <span id="alturaMin">${limits.altura_min}</span> – 
+                                                <span id="alturaMax">${limits.altura_max}</span> m
+                                            </div>
+                                            <button id="applyAlturaFilter" class="apply-button">Aplicar filtro</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="tipo-container-filter-title">
+                                        <h1 class="title-filtros-text">Peso (kg)</h1>
+                                    </div>
+
+                                    <div class="slider-wrapper">
+                                        <div>
+                                            <div id="slider-peso"></div>
+                                            <div class="range-values">
+                                                <span id="pesoMin">${limits.peso_min}</span> – 
+                                                <span id="pesoMax">${limits.peso_max}</span> m
+                                            </div>
+                                            <button id="applyPesoFilter" class="apply-button">Aplicar filtro</button>
+                                        </div>
+                                    </div>
+                                    <div class="espacio">
+                                    </div>
+                                `;
+        let rangeAltura = document.getElementById('slider-altura');
+        
+        noUiSlider.create(rangeAltura, {
+            start: [limits.altura_min, limits.altura_max],
+            range: {
+                'min': limits.altura_min,
+                'max': limits.altura_max
+            }
+        });
+        const alturaMin = document.getElementById('alturaMin');
+        const alturaMax = document.getElementById('alturaMax');
+
+        rangeAltura.noUiSlider.on('update', (values) => {
+            alturaMin.textContent = values[0];
+            alturaMax.textContent = values[1];
+        });
+
+        let rangePeso = document.getElementById('slider-peso');
+        
+        noUiSlider.create(rangePeso, {
+            start: [limits.peso_min, limits.peso_max],
+            range: {
+                'min': limits.peso_min,
+                'max': limits.peso_max
+            }
+        });
+        const pesoMin = document.getElementById('pesoMin');
+        const pesoMax = document.getElementById('pesoMax');
+
+        rangePeso.noUiSlider.on('update', (values) => {
+            pesoMin.textContent = values[0];
+            pesoMax.textContent = values[1];
+        });
+
+        document.getElementById('applyAlturaFilter').addEventListener('click', function () {
+            let values = rangeAltura.noUiSlider.get();
+            let minAltura = parseFloat(values[0]);
+            let maxAltura = parseFloat(values[1]);
+
+            establecerFiltro(null, {
+                altura_min: minAltura,
+                altura_max: maxAltura
+            });
+        });
+
+        document.getElementById('applyPesoFilter').addEventListener('click', function () {
+            let values = rangePeso.noUiSlider.get();
+            let minPeso = parseFloat(values[0]);
+            let maxPeso = parseFloat(values[1]);
+
+            establecerFiltro(null, {
+                peso_min: minPeso,
+                peso_max: maxPeso
+            });
+        });
         guideChanged = true
     } else{
-        innerScreen.style.filter = "blur(0)"
-        innerScreenOverlay.style.visibility = "blur(0)"
-        filterScreen.style.visibility = "hidden"
-        guideChanged = false
+        innerScreen.style.filter = "none";
+        filterScreen.style.visibility = "hidden";
+        guideChanged = false;
     }
 }
 
-async function establecerFiltro(tipo){
+async function establecerFiltro(valor = null, alturaMinMax = null) {
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando");
-    overlayNotTouch.style.display = "flex"
-    filterTypeNew = tipo
-    if(!hasFilter && filterTypeOld != filterTypeNew){
-        hasFilter = true
-        filterTypeOld = filterTypeNew
+    overlayNotTouch.style.display = "flex";
+
+    const esTipo = pokemonTypes.includes(valor);
+    const esGeneracion = generations.includes(valor);
+
+    if (valor) filterTypeNew = valor;
+
+    if (!hasFilter && filterTypeOld != filterTypeNew) {
+        hasFilter = true;
+        filterTypeOld = filterTypeNew;
     } else {
-        if(filterTypeNew === filterTypeOld){
-            hasFilter = false
-            idPokemonFilter  = 0
-            filterTypeOld = ""
+        if (filterTypeNew === filterTypeOld && !alturaMinMax) {
+            hasFilter = false;
+            idPokemonFilter = 0;
+            filterTypeOld = "";
             initialize(id).finally(() => {
-                blueButton.classList.remove("parpadeando")
-                overlayNotTouch.style.display = "none"
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none";
             });
-            innerScreen.style.filter = "blur(0)"
-            innerScreenOverlay.style.visibility = "blur(0)"
-            filterScreen.style.visibility = "hidden"
-            arrayFiltroId = []
+            innerScreen.style.filter = "blur(0)";
+            innerScreenOverlay.style.visibility = "blur(0)";
+            filterScreen.style.visibility = "hidden";
+            arrayFiltroId = [];
             return;
         } else {
-            filterTypeOld = filterTypeNew
-            arrayFiltroId = []
-            idPokemonFilter = 0
+            filterTypeOld = filterTypeNew;
+            arrayFiltroId = [];
+            idPokemonFilter = 0;
         }
     }
+
     try {
-        // Crea el cuerpo de la solicitud con el número de Pokémon  // Aquí deberías pasar el número que deseas buscar
         const bodyData = new URLSearchParams();
-        bodyData.append('tipo', tipo);
-      
-        // Realiza la solicitud POST
+
+        if (esTipo) bodyData.append('tipo', valor);
+        else if (esGeneracion) bodyData.append('generacion', valor);
+        console.log("Valor del filtro:", alturaMinMax);  // Aquí imprimes el valor del filtro
+        if (alturaMinMax) {
+            if ('altura_min' in alturaMinMax && 'altura_max' in alturaMinMax) {
+                bodyData.append('altura_min', alturaMinMax.altura_min);
+                bodyData.append('altura_max', alturaMinMax.altura_max);
+            }
+
+            if ('peso_min' in alturaMinMax && 'peso_max' in alturaMinMax) {
+                bodyData.append('peso_min', alturaMinMax.peso_min);
+                bodyData.append('peso_max', alturaMinMax.peso_max);
+            }
+        }
+        console.log("Cuerpo de la solicitud:", bodyData.toString());  // Aquí imprimes el cuerpo de la solicitud
         const response = await fetch("../php/getPokemon.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: bodyData.toString()  // Convierte el cuerpo de los parámetros en un string
+            body: bodyData.toString()
         });
-    
-        // Verifica si la respuesta es exitosa
+
         if (!response.ok) throw new Error("HTTP error " + response.status);
-    
-        // Obtiene la respuesta como texto
+
         const text = await response.text();
-    
-        // Intenta parsear la respuesta JSON
         const data = JSON.parse(text);
-    
+
         if (data.status === "success") {
-            arrayFiltroId = data.data
+            arrayFiltroId = data.data;
             arrayFiltroId.sort((a, b) => a.numero_pokedex - b.numero_pokedex);
         } else {
             console.warn("No se encontró el Pokémon:", data.message);
         }
-      
+
     } catch (error) {
         console.error("Error al obtener datos:", error);
     }
-    initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
-        blueButton.classList.remove("parpadeando")
-        overlayNotTouch.style.display = "none"
+    console.log("Array de Pokémon filtrados:", arrayFiltroId[idPokemonFilter].numero_pokedex);
+    initialize(arrayFiltroId[idPokemonFilter]?.numero_pokedex ?? id).finally(() => {
+        blueButton.classList.remove("parpadeando");
+        overlayNotTouch.style.display = "none";
     });
-    innerScreen.style.filter = "blur(0)"
-    innerScreenOverlay.style.visibility = "blur(0)"
-    filterScreen.style.visibility = "hidden"
+
+    innerScreen.style.filter = "blur(0)";
+    innerScreenOverlay.style.visibility = "blur(0)";
+    filterScreen.style.visibility = "hidden";
 }
 
 function showShiny(){
