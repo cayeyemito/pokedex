@@ -986,18 +986,21 @@ function nextPokemon(){
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando");
     overlayNotTouch.style.display = "flex"
+    disableControls(true);
     if(!hasFilter){
         if(id<1025){
             id++
             initialize(id).finally(() => {
                 blueButton.classList.remove("parpadeando")
                 overlayNotTouch.style.display = "none"
+                disableControls(false);
             });
         } else{
             id = 1
             initialize(id).finally(() => {
                 blueButton.classList.remove("parpadeando")
                 overlayNotTouch.style.display = "none"
+                disableControls(false);
             });
         }
     } else {
@@ -1006,12 +1009,14 @@ function nextPokemon(){
             initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
                 blueButton.classList.remove("parpadeando")
                 overlayNotTouch.style.display = "none"
+                disableControls(false);
             });
         } else {
             idPokemonFilter = 0
             initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
                 blueButton.classList.remove("parpadeando")
                 overlayNotTouch.style.display = "none"
+                disableControls(false);
             });
         }
     }
@@ -1028,37 +1033,43 @@ function resetAll(){
     hasChanged = false
 }
 
-function previousPokemon(){
-    resetAll()
+function previousPokemon() {
+    resetAll();
     const blueButton = document.querySelector(".blue-button");
-    blueButton.classList.add("parpadeando"); 
-    overlayNotTouch.style.display = "flex"
-    if(!hasFilter){
-        if(id>1){
-            id--
+    blueButton.classList.add("parpadeando");
+    overlayNotTouch.style.display = "flex";
+    disableControls(true);  // Deshabilitar botones y teclas
+
+    if (!hasFilter) {
+        if (id > 1) {
+            id--;
             initialize(id).finally(() => {
-                blueButton.classList.remove("parpadeando")
-                overlayNotTouch.style.display = "none"
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none";
+                disableControls(false);  // Habilitar botones y teclas
             });
-        } else{
-            id = 1025
+        } else {
+            id = 1025;
             initialize(id).finally(() => {
-                blueButton.classList.remove("parpadeando")
-                overlayNotTouch.style.display = "none"
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none";
+                disableControls(false);  // Habilitar botones y teclas
             });
         }
     } else {
-        if(idPokemonFilter>0){
-            idPokemonFilter--
+        if (idPokemonFilter > 0) {
+            idPokemonFilter--;
             initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
-                blueButton.classList.remove("parpadeando")
-                overlayNotTouch.style.display = "none"
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none";
+                disableControls(false);  // Habilitar botones y teclas
             });
         } else {
-            idPokemonFilter = arrayFiltroId.length-1
+            idPokemonFilter = arrayFiltroId.length - 1;
             initialize(arrayFiltroId[idPokemonFilter].numero_pokedex).finally(() => {
-                blueButton.classList.remove("parpadeando")
-                overlayNotTouch.style.display = "none"
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none";
+                disableControls(false);  // Habilitar botones y teclas
             });
         }
     }
@@ -2051,3 +2062,27 @@ filterInput.addEventListener('input', () => {
         filterInput.value = '1025';
     }
 });
+
+function disableControls(disable) {
+    // Deshabilitar los botones de cambio
+    document.getElementById('right-pad-button').disabled = disable;
+    document.getElementById('left-pad-button').disabled = disable;
+
+    // Deshabilitar el listener de teclas
+    if (disable) {
+        document.removeEventListener('keydown', keyboardNavigation);
+    } else {
+        document.addEventListener('keydown', keyboardNavigation);
+    }
+}
+
+function keyboardNavigation(event) {
+    if (event.key === "ArrowRight") {
+        nextPokemon();
+    } else if (event.key === "ArrowLeft") {
+        previousPokemon();
+    }
+}
+
+// Event listener para las teclas, solo se habilita cuando no se está cargando
+document.addEventListener('keydown', keyboardNavigation);
