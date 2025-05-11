@@ -72,6 +72,17 @@ const pokemonTypes = [
     "steel",
     "fairy"
 ];
+const generations = [
+    "kanto",
+    "johto",
+    "hoenn",
+    "sinnoh",
+    "unova",
+    "kalos",
+    "alola",
+    "galar",
+    "paldea"
+];
 let arrayFiltroId = []
 let idPokemonFilter = 0
 let hasFilter = false
@@ -79,20 +90,21 @@ let filterTypeNew = ""
 let filterTypeOld = ""
 let filterScreen = document.getElementById("filtrador")
 let urshifu
+let idForFilter
 
 async function initialize(numberPokedex) {
 
     if (chartInstance) {
         chartInstance.destroy();
     }
-
     if(!pokemonEspecialForm && !hasFilter){
         pokemon = await getPokemonInfo(id);
         getForms()
     } else if(hasFilter && !pokemonEspecialForm){
         pokemon = await getPokemonInfo(numberPokedex);
         getForms()
-    } else {
+    }
+    else {
         pokemon = await getSpecialPokemonInfo(numberPokedex);
         Object.assign(pokemon, {
             genero: pokemonOriginal.genero,
@@ -107,21 +119,26 @@ async function initialize(numberPokedex) {
                                             passPreviousForm()">
                                     </div>`
         }
+        if(hasFilter){
+            idForFilter = pokemonOriginal.numero_pokedex
+        } else {
+            idForFilter = id
+        }
         if(isMega && pokemon.nombre.includes("mega")){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
-                                        <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
-                                    </div>`
+                                    <img src="img/megaevolucion.png" class="mega-evolution-icon" onclick="startMegaEvo(${idForFilter})">
+                                </div>`
         } else if(isMega && pokemon.nombre.includes("kyogre-primal")){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
-                                        <img src="img/kyogrePrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
+                                        <img src="img/kyogrePrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${idForFilter})">
                                     </div>`
         } else if(isMega && pokemon.nombre.includes("groudon-primal")){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
-                                        <img src="img/groudonPrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${id})">
+                                        <img src="img/groudonPrimal.png" class="mega-evolution-icon" onclick="startMegaEvo(${idForFilter})">
                                     </div>`
         } else if(isGigamax){
             formsScreen.innerHTML +=`<div class="mega-evolution-container">
-                                        <img src="img/gigamax.png" class="mega-evolution-icon" onclick="startGigamax(${id})">
+                                        <img src="img/gigamax.png" class="mega-evolution-icon" onclick="startGigamax(${idForFilter})">
                                     </div>`
         } else if (isFormaAlterna) {
             let juego = "";
@@ -135,11 +152,11 @@ async function initialize(numberPokedex) {
             } else if (pokemon.nombre.toLowerCase().includes("galar")) {
                 juego = "galar";
             }
-        
+            console.log(idForFilter)
             formsScreen.innerHTML += `
                 <div class="mega-evolution-container">
                     <img src="img/${juego}.png" class="mega-evolution-icon logo-sol-icono"
-                         onclick="toggleFormaRegional(${id})">
+                         onclick="toggleFormaRegional(${idForFilter})">
                 </div>`;
         } else if(!esImportante){
             formsScreen.innerHTML = `<div class="mega-evolution-container">
@@ -167,7 +184,6 @@ async function initialize(numberPokedex) {
     }
 
     if(pokemon.nombre.includes("Urshifu") && !pokemon.nombre.includes("gmax") && !pokemon.nombre.includes("rapid-strike")){
-        console.log("Urshifu")
         urshifu = pokemon
     }
 
@@ -325,9 +341,17 @@ function showFilter(){
         filterScreen.innerHTML = `<div class="tipo-container-filter-title">
                                         <h1 class="title-filtros-text">Tipos</h1>
                                 </div>`
-        for(let i=0; i<pokemonTypes.length-1;i++){
+        for(let i=0; i<pokemonTypes.length;i++){
             filterScreen.innerHTML += `<div class="tipo-container-filter">
                                         <img src="img/iconos_tipos/Icon_${pokemonTypes[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${pokemonTypes[i]}')">
+                                    </div>`
+        }
+        filterScreen.innerHTML += `<div class="tipo-container-filter-title">
+                                        <h1 class="title-filtros-text">Generación</h1>
+                                </div>`
+        for(let i=0; i<generations.length;i++){
+            filterScreen.innerHTML += `<div class="tipo-container-filter">
+                                        <img src="img/generaciones/${generations[i]}.webp" class="iconos_tipos2" onclick="establecerFiltro('${generations[i]}')">
                                     </div>`
         }
         guideChanged = true
@@ -990,7 +1014,6 @@ async function passNextAttack() {
         idMovimiento = (idMovimiento === movimientosTipo.length - 1)
             ? 0
             : idMovimiento + 1;
-
         showMovements(idMovimientoTipo);
     } else if(stat === 5) {
         idAbility = (idAbility === habilidades.length - 1)
@@ -1000,7 +1023,7 @@ async function passNextAttack() {
     } else if(stat === 4 && comprobacion.length > 0){
         idEvolucion = (idEvolucion === comprobacion.length - 1)
             ? 0
-            : idAbility + 1;
+            : idEvolucion + 1;
         createEvolutionChain()
     }
 }
@@ -1561,13 +1584,10 @@ function getForms(){
 
         // Detectar forma actual para decidir qué gigamax mostrar
         let gmaxActual = null;
-        console.log(pokemon.nombre)
         if (pokemon.nombre.includes("rapid-strike")) {
             gmaxActual = gmaxUrshi2;
-            console.log(gmaxActual)
         } else if (pokemon.nombre.includes("Urshifu")) {
             gmaxActual = gmaxUrshi1;
-            console.log(gmaxActual)
         } else {
             gmaxActual = gmax;
         }
@@ -1746,10 +1766,18 @@ function toggleFormaRegional(newId) {
         });
     } else {
         pokemonEspecialForm = false;
-        initialize(id).finally(() => {
-            blueButton.classList.remove("parpadeando");
-            overlayNotTouch.style.display = "none"
-        });
+        if(hasFilter){
+            initialize(pokemonOriginal.numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none"
+            });
+        }else{
+            pokemonEspecialForm = false;
+            initialize(id).finally(() => {
+                blueButton.classList.remove("parpadeando");
+                overlayNotTouch.style.display = "none"
+            });
+        }
     }
 }
 
@@ -1818,7 +1846,13 @@ async function toggleForm({
         pokemonEspecialForm = false;
     }
 
-    const targetId = goingToForm ? newId : id;
+    let targetId;
+
+    if (hasFilter) {
+        targetId = newId;
+    } else {
+        targetId = goingToForm ? newId : id;
+    }
 
     const screen2Timeout = setTimeout(() => {
         screen2.style.display = 'flex';
