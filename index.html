@@ -88,7 +88,48 @@
                                 <div class="inner-screen-overlay-glass" id="inner-screen-overlay-glass">
                                 </div>
                                 <div class="guide-screen" id="guide-screen">
-                                    <p class="guide-text">Bienvenido a la guia de la pokedex. Aqui te explciaremos su funcionamiento por si se encuentra perdido!<br><br>En este sector de la pokedex encontra diferentes botones, cada uno con su propia función. <br><br>1. El bton de shiny, a la derecha del boton de ayuda, le permitira canviar la imagen del pokémon en pantalla por su version shiny, asi podra verlo en su forma más especial. <br><br>2. A la derecha tenemos el boton de fondo. Cada tipo cuenta con dos fondos, el basico y el animado, quedate con el que mas te guste! <br><br> 3. A continuación tenemos el dpad, cuya función principal sera moverse por la pantalla de la derecha. Con los botones de derecha e izquierda podra ir canviando entre los diferentes menus, como habilidades, movimientos, etc., mientras que los botones de arriba y abajo te permitiran desplazarte, en los menus que lo permitan, al siguiente movimiento por ejemplo
+                                    <p class="guide-text">🧭 Guía de Controles<br><br>
+                                        ➡️ Flecha derecha (→) o botón "Siguiente": Ver el próximo Pokémon.
+                                        <br><br>
+                                        ⬅️ Flecha izquierda (←) o botón "Anterior": Ver el Pokémon anterior.
+                                        <br><br>
+
+                                        📉 Letra A o el pad izquierdo: Ver la estadística anterior del Pokémon.
+                                        <br><br>
+                                        📈 Letra D o el pad derecho: Ver la siguiente estadística del Pokémon.
+                                        <br><br>
+
+                                        🔢 Teclas del 0 al 9 o botones de números en pantalla: Escribe el número del Pokémon que quieres buscar.
+                                        <br><br>
+                                        ⌫ Retroceso (← Backspace) o botón "Borrar": Borra el último número que escribiste.
+                                        <br><br>
+                                        🔍 Enter (↵) o botón "Buscar": Busca al Pokémon con el número que escribiste.
+                                        <br><br>
+
+                                        🔊 Letra C o botón "Grito": Escucha el grito del Pokémon.
+                                        <br><br>
+                                        🖼️ Letra F o botón "Fondo": Cambia el fondo de la pantalla.
+                                        <br><br>
+                                        ✨ Letra P o botón "Shiny": Cambia entre la versión normal y shiny del Pokémon.
+                                        <br><br>
+
+                                        🧠 Teclas del 1 al 4 o botones numerados: Muestra los detalles de los movimientos del Pokémon (cuando está abierto el menú de movimientos).
+                                        <br><br>
+
+                                        📘 Letra G o botón "Guía": Muestra esta guía de ayuda.
+                                        <br><br>
+                                        ⚙️ Letra H o el pad central: Abre el panel para filtrar por tipo, generación, etc.
+                                        <br><br>
+
+                                        ❌ Tecla Escape (Esc) o botón rojo debajo de la pantalla.<br>
+                                        🔙 Si estás viendo los movimientos, vuelve atrás.<br>
+                                        📴 Si estás en el menú principal, apaga o cierra la pantalla.<br>
+                                        <br><br>
+
+                                        🔼 Flecha arriba (↑) o letra W: En pantallas donde se vea una marca ver la vista siguiente.
+                                        <br><br>
+                                        🔽 Flecha abajo (↓) o letra S: En pantallas donde se vea una marca ver la vista anterior.
+                                        <br><br>
                                     </p>
                                 </div>
                                 <div class="guide-screen flex" id="filtrador">
@@ -97,7 +138,7 @@
                             </div>
                             <div class="bottom-decorations-container">
                                 <div class="on-off-container">
-                                    <div class="on-off-button" onclick="turnOffScreen()"> 
+                                    <div class="on-off-button" id="turn-on-off" onclick="turnOffScreen()"> 
                                     </div>
                                 </div>
                                 <div class="empty4">
@@ -124,7 +165,7 @@
                     <div class="all-buttons-container">
                         <div class="left-row">
                             <div class="guide-button-container">
-                                <div class="guide-button" onclick="showGuide()">
+                                <div class="guide-button" id="show-guide" onclick="showGuide()">
                                     <h1 class="guide-text-button">?</h1>
                                 </div>
                                 <div class="guide-button2">
@@ -148,13 +189,13 @@
                         <div class="middle-row">
                             <div class="some-buttons-container">
                                 <div class="thin-green-button-container">
-                                    <div class="thin-green-button strong-green buttonShiBack" onclick="showShiny()">
+                                    <div class="thin-green-button strong-green buttonShiBack" id="show-shiny" onclick="showShiny()">
                                         <h1 class="shiny-text-button">Shiny</h1>
                                     </div>
                                 </div>
                                 <div class="empty"></div>
                                 <div class="thin-orange-button-container">
-                                    <div class="thin-orange-button orange buttonShiBack" onclick="changeBackground()">
+                                    <div class="thin-orange-button orange buttonShiBack" id="change-background" onclick="changeBackground()">
                                         <h1 class="fondo-text-button">Fondo</h1>
                                     </div>
                                 </div>
@@ -171,23 +212,23 @@
                         <div class="right-row">
                             <div class="dpad-top-container">
                                 <div class="dpad-top">
-                                    <div class="directional up" onclick="passPreviousAttack()"></div>
+                                    <div class="directional up" id="pass-previous-attack" onclick="passPreviousAttack()"></div>
                                 </div>
                             </div>
                             <div class="dpad-middle-container">
                                 <div class="dpad-left">
-                                    <div class="directional left" onclick="passPreviousStat()"></div>
+                                    <div class="directional left" id="pass-previous-stat" onclick="passPreviousStat()"></div>
                                 </div>
                                 <div class="dpad-middle">
-                                    <div class="circle circleBig" onclick="showFilter()"></div>
+                                    <div class="circle circleBig" id="show-filter" onclick="showFilter()"></div>
                                 </div>
                                 <div class="dpad-right">
-                                    <div class="directional right" onclick="passNextStat()"></div>
+                                    <div class="directional right" id="pass-next-stat" onclick="passNextStat()"></div>
                                 </div>
                             </div>
                             <div class="dpad-bottom-container">
                                 <div class="dpad-bottom">
-                                    <div class="directional down" onclick="passNextAttack()"></div>
+                                    <div class="directional down" id="pass-next-attack" onclick="passNextAttack()"></div>
                                 </div>
                             </div>
                         </div>
@@ -249,54 +290,54 @@
                 <div class="numerical-buttons-container">
                     <div class="top-numerical-button-container">
                         <div class="button-container top top-left-button">
-                            <div class="button top2" style="margin-left: 20%;" onclick="searchPokemonInput(0)">
+                            <div class="button top2" style="margin-left: 20%;" id="buton0" onclick="searchPokemonInput(0)">
                                 <p class="number-button-text">0</p>
                             </div>
                         </div>
                         <div class="button-container top">
-                            <div class="button top2" onclick="searchPokemonInput(1)">
+                            <div class="button top2" id="buton1" onclick="searchPokemonInput(1)">
                                 <p class="number-button-text">1</p>
                             </div>
                         </div>
                         <div class="button-container top">
-                            <div class="button top2" onclick="searchPokemonInput(2)">
+                            <div class="button top2" id="buton2" onclick="searchPokemonInput(2)">
                                 <p class="number-button-text">2</p>
                             </div>
                         </div>
                         <div class="button-container top">
-                            <div class="button top2" onclick="searchPokemonInput(3)">
+                            <div class="button top2" id="buton3" onclick="searchPokemonInput(3)">
                                 <p class="number-button-text">3</p>
                             </div>
                         </div>
                         <div class="button-container top top-right-button">
-                            <div class="button top2" style="margin-right: 20%;" onclick="searchPokemonInput(4)">
+                            <div class="button top2" style="margin-right: 20%;" id="buton4" onclick="searchPokemonInput(4)">
                                 <p class="number-button-text">4</p>
                             </div>
                         </div>
                     </div>
                     <div class="bottom-numerical-button-container">
                         <div class="button-container bottom bottom-left-button">
-                            <div class="button bottom2" style="margin-left: 20%;" onclick="searchPokemonInput(5)">
+                            <div class="button bottom2" style="margin-left: 20%;" id="buton5" onclick="searchPokemonInput(5)">
                                 <p class="number-button-text">5</p>
                             </div>
                         </div>
                         <div class="button-container bottom">
-                            <div class="button bottom2" onclick="searchPokemonInput(6)">
+                            <div class="button bottom2" id="buton6" onclick="searchPokemonInput(6)">
                                 <p class="number-button-text">6</p>
                             </div>
                         </div>
                         <div class="button-container bottom">
-                            <div class="button bottom2" onclick="searchPokemonInput(7)">
+                            <div class="button bottom2" id="buton7" onclick="searchPokemonInput(7)">
                                 <p class="number-button-text">7</p>
                             </div>
                         </div>
                         <div class="button-container bottom">
-                            <div class="button bottom2" onclick="searchPokemonInput(8)">
+                            <div class="button bottom2" id="buton8" onclick="searchPokemonInput(8)">
                                 <p class="number-button-text">8</p>
                             </div>
                         </div>
-                        <div class="button-container bottom bottom-right-button" onclick="searchPokemonInput(9)">
-                            <div class="button bottom2" style="margin-right: 20%">
+                        <div class="button-container bottom bottom-right-button">
+                            <div class="button bottom2" id="buton9" style="margin-right: 20%" onclick="searchPokemonInput(9)">
                                 <p class="number-button-text">9</p>
                             </div>
                         </div>
@@ -304,12 +345,12 @@
                     <div class="last-elements-container">
                         <div class="search-erase-button-container">
                             <div class="search-button-container">
-                                <div class="circle circleBig2" onclick="searchPokemon()">
+                                <div class="circle circleBig2" id="search-pokemon" onclick="searchPokemon()">
                                     <img src="img/lupa.png" class="littleIcon" alt="">
                                 </div>
                             </div>
                             <div class="erase-button-container">
-                                <div class="circle circleBig2" onclick="deleteLastNumber()">
+                                <div class="circle circleBig2" id="erase-number" onclick="deleteLastNumber()">
                                     <img src="img/borrar.png" class="littleIcon" alt="">
                                 </div>
                             </div>
@@ -334,7 +375,7 @@
                             </div>
                         </div>
                         <div class="cry-button-container">
-                            <div class="cry-button" onclick="reproSoundCry()">
+                            <div class="cry-button" id="cry-button" onclick="reproSoundCry()">
                                 <img src="img/volumen.png" class="littleIconCry">
                             </div>
                             <div class="guide-button2"></div>
@@ -348,6 +389,7 @@
     </div>
     <div class="overlayNotTouch" id="notTouch">
     </div>
+    <audio id="bg-music" src="mp3/Route 29_ Remastered ► Pokémon Heart Gold & Soul Silver (320 kbps).mp3" loop></audio>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/main.js"></script>
     <script src="node_modules/nouislider/dist/nouislider.js"></script>

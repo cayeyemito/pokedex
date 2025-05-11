@@ -91,6 +91,7 @@ let filterTypeOld = ""
 let filterScreen = document.getElementById("filtrador")
 let urshifu
 let idForFilter
+let isMovementsOptions
 
 async function initialize(numberPokedex) {
 
@@ -605,6 +606,7 @@ function passNextStat() {
         movementScreen.style.visibility = "hidden";
         stat4.style.transform = "scale(1.3)";
         stat3.style.transform = "scale(1)";
+        isMovementsOptions = false;
         stat++;
     } else if (stat === 4) {
         abilityScreen.style.visibility = "visible";
@@ -655,6 +657,7 @@ function passPreviousStat() {
         movementScreen.style.visibility = "hidden";
         stat2.style.transform = "scale(1.3)";
         stat3.style.transform = "scale(1)";
+        isMovementsOptions = false;
         stat--;
     } else if (stat === 4) {
         movementScreen.style.visibility = "visible";
@@ -975,7 +978,22 @@ async function getSpecialPokemonInfo(numeroPokedex) {
 }
 
 function reproSoundCry(){
-    const audio = new Audio(pokemon.grito);
+    const bgMusic = document.getElementById('bg-music'); // Música de fondo
+    const audio = new Audio(pokemon.grito); // Sonido del grito
+
+    // Pausar la música de fondo si está sonando
+    if (!bgMusic.paused) {
+        bgMusic.pause(); // Pausar música
+        const currentTime = bgMusic.currentTime; // Guardar el tiempo actual de la música
+
+        // Reanudar música de fondo después de que el grito termine
+        audio.onended = function() {
+            bgMusic.currentTime = currentTime; // Reanudar desde el mismo lugar
+            bgMusic.play(); // Reproducir música de fondo
+        };
+    }
+
+    // Reproducir el grito
     audio.play().catch(error => {
         console.error("Error al reproducir el grito:", error);
     });
@@ -1209,6 +1227,7 @@ async function passPreviousAttack() {
 async function showMovements(num){
     isChanged = true;
     idMovimientoTipo = num;
+    isMovementsOptions = false;
 
     let arrayMoves;
     let level = "";
@@ -1280,6 +1299,7 @@ async function showMovements(num){
 
 function showMovementsOptions(numMov) {
     isChanged = false;
+    isMovementsOptions = true;
     idMovimiento = 0;
     movementScreen.innerHTML = "";
     movementScreen.classList.remove('flex-direction');
@@ -2067,7 +2087,21 @@ function disableControls(disable) {
     // Deshabilitar los botones de cambio
     document.getElementById('right-pad-button').disabled = disable;
     document.getElementById('left-pad-button').disabled = disable;
-
+    document.getElementById('pass-previous-stat').disabled = disable;
+    document.getElementById('pass-next-stat').disabled = disable;
+    document.getElementById('search-pokemon').disabled = disable;
+    document.getElementById('erase-number').disabled = disable;
+    document.getElementById('cry-button').disabled = disable;
+    document.getElementById('change-background').disabled = disable;
+    document.getElementById('show-guide').disabled = disable;
+    for (let i = 0; i <= 9; i++) {
+        document.getElementById(`buton${i}`).disabled = disable;
+    }
+    document.getElementById(`show-shiny`).disabled = disable;
+    document.getElementById('turn-on-off').disabled = disable;
+    document.getElementById('show-filter').disabled = disable;
+    document.getElementById('pass-next-attack').disabled = disable;
+    document.getElementById('pass-previous-attack').disabled = disable;
     // Deshabilitar el listener de teclas
     if (disable) {
         document.removeEventListener('keydown', keyboardNavigation);
@@ -2077,12 +2111,94 @@ function disableControls(disable) {
 }
 
 function keyboardNavigation(event) {
+    const isTyping = ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName);
+
+    if (isTyping) return;
+
     if (event.key === "ArrowRight") {
         nextPokemon();
     } else if (event.key === "ArrowLeft") {
         previousPokemon();
+    } else if (event.key === "a") {
+        passPreviousStat();
+    } else if (event.key === "d") {
+        passNextStat();
+    } else if (event.key === "Enter") {
+        searchPokemon();
+    } else if (event.key === "Backspace") {
+        deleteLastNumber()
+    } else if (event.key === "c") {
+        reproSoundCry();   
+    } else if (event.key === "f") {
+        changeBackground();
+    } else if (event.key === "g") {
+        showGuide();
+    } else if (event.key === "0") {
+        searchPokemonInput(0)
+    } else if (event.key === "1") {
+        if(isMovementsOptions === true){
+            showMovements(1)
+        } else {
+            searchPokemonInput(1)
+        }
+    }else if (event.key === "2") {
+        if(isMovementsOptions === true){
+            showMovements(2)
+        } else {
+            searchPokemonInput(2)
+        }
+    } else if (event.key === "3") {
+        if(isMovementsOptions === true){
+            showMovements(3)
+        } else {
+            searchPokemonInput2(3)
+        }
+    } else if (event.key === "4") {
+        if(isMovementsOptions === true){
+            showMovements(4)
+        } else {
+            searchPokemonInput(4)
+        }
+    } else if (event.key === "5") {
+        searchPokemonInput(5);
+    } else if (event.key === "6") {
+        searchPokemonInput(6);
+    } else if (event.key === "7") {
+        searchPokemonInput(7);
+    } else if (event.key === "8") {
+        searchPokemonInput(8);
+    } else if (event.key === "9") {
+        searchPokemonInput(9);
+    } else if (event.key === "p") {
+        showShiny();
+    } else if (event.key === "Escape") {
+        if(isChanged === true){
+            showMovementsOptions(1);
+        } else {
+            turnOffScreen();
+        }
+    } else if (event.key === "h") {
+        showFilter();
+    } else if (event.key === "ArrowDown" || event.key === "s") {
+        passNextAttack();
+    } else if (event.key === "ArrowUp" || event.key === "w") {
+        passPreviousAttack();
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const audio = document.getElementById('bg-music');
+    audio.volume = 0.5; // Ajusta el volumen aquí (0.0 a
+
+    function enableMusic() {
+        audio.play().catch(() => {});
+        document.removeEventListener('click', enableMusic);
+        document.removeEventListener('keydown', enableMusic);
+    }
+
+    document.addEventListener('click', enableMusic);
+    document.addEventListener('keydown', enableMusic);
+});
 
 // Event listener para las teclas, solo se habilita cuando no se está cargando
 document.addEventListener('keydown', keyboardNavigation);
