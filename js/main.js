@@ -52,6 +52,7 @@ let esImportante = false;
 let idForma = -1
 let hasChanged = false
 let overlayNotTouch = document.getElementById("notTouch")
+let darmanitanGalar
 const pokemonTypes = [
     "normal",
     "fire",
@@ -92,6 +93,10 @@ let filterScreen = document.getElementById("filtrador")
 let urshifu
 let idForFilter
 let isMovementsOptions
+let galarZenId
+let taurosPaldea
+let taurosPaldeaArrayId = []
+const audio = document.getElementById('bg-music');
 
 async function initialize(numberPokedex) {
 
@@ -153,7 +158,6 @@ async function initialize(numberPokedex) {
             } else if (pokemon.nombre.toLowerCase().includes("galar")) {
                 juego = "galar";
             }
-            console.log(idForFilter)
             formsScreen.innerHTML += `
                 <div class="mega-evolution-container">
                     <img src="img/${juego}.png" class="mega-evolution-icon logo-sol-icono"
@@ -175,11 +179,11 @@ async function initialize(numberPokedex) {
                                             passNextForm()">
                                     </div>`
         }
-        if(pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax")){
+        if(pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax") || pokemon.nombre.includes("galar-standard") || pokemon.nombre.includes("galar-zen") || pokemon.nombre.includes("tauros-paldea")) {
             formsScreen.innerHTML = ""
             getForms()
         }
-        if(pokemon.nombre.includes("rapid-strike-gmax")){
+        if(pokemon.nombre.includes("rapid-strike-gmax") && pokemon.nombre.includes("galar-zen")){
             idForma = -1
         }
     }
@@ -517,7 +521,6 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
 
         if (esTipo) bodyData.append('tipo', valor);
         else if (esGeneracion) bodyData.append('generacion', valor);
-        console.log("Valor del filtro:", alturaMinMax);  // Aquí imprimes el valor del filtro
         if (alturaMinMax) {
             if ('altura_min' in alturaMinMax && 'altura_max' in alturaMinMax) {
                 bodyData.append('altura_min', alturaMinMax.altura_min);
@@ -529,7 +532,6 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
                 bodyData.append('peso_max', alturaMinMax.peso_max);
             }
         }
-        console.log("Cuerpo de la solicitud:", bodyData.toString());  // Aquí imprimes el cuerpo de la solicitud
         const response = await fetch("../php/getPokemon.php", {
             method: "POST",
             headers: {
@@ -553,7 +555,6 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
     } catch (error) {
         console.error("Error al obtener datos:", error);
     }
-    console.log("Array de Pokémon filtrados:", arrayFiltroId[idPokemonFilter].numero_pokedex);
     initialize(arrayFiltroId[idPokemonFilter]?.numero_pokedex ?? id).finally(() => {
         blueButton.classList.remove("parpadeando");
         overlayNotTouch.style.display = "none";
@@ -596,6 +597,7 @@ function passNextStat() {
         stat1.style.transform = "scale(1)";
         stat++;
     } else if (stat === 2) {
+        isMovementsOptions = true;
         statsScreen.style.visibility = "hidden";
         movementScreen.style.visibility = "visible";
         stat3.style.transform = "scale(1.3)";
@@ -660,6 +662,7 @@ function passPreviousStat() {
         isMovementsOptions = false;
         stat--;
     } else if (stat === 4) {
+        isMovementsOptions = true;
         movementScreen.style.visibility = "visible";
         evolutionScreen.style.visibility = "hidden";
         stat3.style.transform = "scale(1.3)";
@@ -1097,23 +1100,56 @@ function passNextForm(){
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); 
     overlayNotTouch.style.display = "flex"
-    if(!hasChanged){
+    if(!hasChanged && !pokemon.nombre.includes("darmanitan-galar") && !pokemon.nombre.includes("tauros-paldea")){
+        console.log("no ha cambiado")
         pokemonOriginal = pokemon
         hasChanged = true
     }
     pokemonEspecialForm = true;
+    if(pokemon.nombre.includes("galar-standard")){
+        initialize(galarZenId).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
+        return
+    } 
+    if(pokemon.nombre.includes("galar-zen")){
+        initialize(darmanitanGalar.numero_pokedex).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
+        return
+    }
+    if(pokemon.nombre.includes("tauros-paldea")){
+        if(idForma < taurosPaldeaArrayId.length-1){
+            idForma++
+            initialize(taurosPaldeaArrayId[idForma]).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            return
+        } else {
+            initialize(taurosPaldea.numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            idForma = -1
+            return
+        }
+    }
     if(idForma<formasArrayId.length-1){
         idForma++
         initialize(formasArrayId[idForma]).finally(() => {
             blueButton.classList.remove("parpadeando")
             overlayNotTouch.style.display = "none"
-        });
+        }); 
     } else{
         pokemonEspecialForm = false
         initialize(id).finally(() => {
             blueButton.classList.remove("parpadeando")
             overlayNotTouch.style.display = "none"
         });
+        formasArray = []
         idForma = -1
     }
 }
@@ -1122,12 +1158,50 @@ function passPreviousForm(){
     const blueButton = document.querySelector(".blue-button");
     blueButton.classList.add("parpadeando"); 
     overlayNotTouch.style.display = "flex"
-    if(!hasChanged){
+    if(!hasChanged && !pokemon.nombre.includes("darmanitan-galar") && !pokemon.nombre.includes("tauros-paldea")){
         pokemonOriginal = pokemon
         hasChanged = true
     }
     pokemonEspecialForm = true;
-
+    if(pokemon.nombre.includes("galar-standard")){
+        initialize(galarZenId).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
+        return
+    } 
+    if(pokemon.nombre.includes("galar-zen")){
+        initialize(darmanitanGalar.numero_pokedex).finally(() => {
+            blueButton.classList.remove("parpadeando")
+            overlayNotTouch.style.display = "none"
+        });
+        return
+    }
+    if(pokemon.nombre.includes("tauros-paldea")){
+        if(idForma>0){
+            idForma--
+            initialize(taurosPaldeaArrayId[idForma]).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            return
+        } else if(idForma > -1){
+            idForma = -1;
+            initialize(taurosPaldea.numero_pokedex).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            return
+        } 
+        else{
+            idForma = taurosPaldeaArrayId.length-1
+            initialize(taurosPaldeaArrayId[idForma]).finally(() => {
+                blueButton.classList.remove("parpadeando")
+                overlayNotTouch.style.display = "none"
+            });
+            return
+        }
+    }
     if(idForma>0){
         idForma--
         initialize(formasArrayId[idForma]).finally(() => {
@@ -1136,6 +1210,7 @@ function passPreviousForm(){
         });
     } else if(idForma > -1){
         idForma = -1;
+        formasArray = []
         pokemonEspecialForm = false
         initialize(id).finally(() => {
             blueButton.classList.remove("parpadeando")
@@ -1231,7 +1306,11 @@ async function showMovements(num){
 
     let arrayMoves;
     let level = "";
-
+    movementScreen.innerHTML = `
+            <div class="loader-overlay">
+                <div class="loader"></div>
+            </div>
+        `;
     // Esperar si la promesa aún no se ha resuelto
     switch (num) {
         case 1:
@@ -1650,12 +1729,18 @@ function getForms(){
     let idMega = [];
     let x = 0, y = 0, mega = 0;
     let gmax = null, paldea = null, alola = null, hisui = null, galar = null, kyogrePrimal = null, groudonPrimal = null, gmaxUrshi1 = null, gmaxUrshi2 = null;
-    if (pokemon.formaEspecial != null || pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax")) {
+    if (pokemon.nombre.includes("darmanitan-galar-standard")) {
+        darmanitanGalar = pokemon
+    }
+    if (pokemon.nombre.includes("tauros-paldea-combat-breed")) {
+        taurosPaldea = pokemon
+    }
+    if (pokemon.formaEspecial != null || pokemon.nombre.includes("rapid-strike") && !pokemon.nombre.includes("rapid-strike-gmax") || pokemon.nombre.includes("galar-standard") || pokemon.nombre.includes("galar-zen") || pokemon.nombre.includes("tauros-paldea")) {
         let formasArrayNombre
-        if(pokemon.nombre.includes("rapid-strike")){
+        if(pokemon.nombre.includes("rapid-strike") || pokemon.nombre.includes("galar-standard") || pokemon.nombre.includes("galar-zen") || pokemon.nombre.includes("tauros-paldea")){
             formasArrayNombre = pokemonOriginal.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
             formasArrayIdSinRecortar = pokemonOriginal.formaEspecial.split(",").map(s => s.trim());
-            formasArrayId =pokemonOriginal.formaEspecial.split(",").map(s => s.trim());
+            formasArrayId = pokemonOriginal.formaEspecial.split(",").map(s => s.trim());
             formsScreen.innerHTML = "";
         } else {
             formasArrayNombre = pokemon.nombresFormaEspecial.split(",").map(s => s.trim().toLowerCase());
@@ -1689,36 +1774,38 @@ function getForms(){
                 }
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("hisui")) {
                 hisui = i;
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("alola") && !forma.includes("totem") && !forma.includes("pikachu")) {
                 alola = i;
                 esImportante = true;
                 recorte = true;
-            } else if (forma.includes("paldea")) {
+            } else if (forma.includes("paldea") && !forma.includes("tauros-paldea-blaze-breed") && !forma.includes("tauros-paldea-aqua-breed")) {
                 paldea = i;
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("galar") && !forma.includes("zen")) {
                 galar = i;
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("kyogre-primal")) {
                 kyogrePrimal = i;
                 esImportante = true;
                 recorte = true;
-
             } else if (forma.includes("groudon-primal")) {
                 groudonPrimal = i;
                 esImportante = true;
                 recorte = true; 
             } else if (forma.includes("totem")) {
+                recorte = true;
+            } else if (forma.includes("galar-zen")) {
+                galarZenId = formasArrayIdSinRecortar[i];
+                recorte = true;
+            } else if (forma.includes("tauros-paldea-blaze-breed") || forma.includes("tauros-paldea-aqua-breed")) { 
+                taurosPaldeaArrayId.push(formasArrayIdSinRecortar[i]);
+                esImportante = true;
                 recorte = true;
             }
 
@@ -1728,6 +1815,9 @@ function getForms(){
                 formasArrayId.splice(k, 1);
                 k--;
             }
+        }
+        if (taurosPaldeaArrayId.length > 2) {
+            taurosPaldeaArrayId = taurosPaldeaArrayId.slice(0, 2);
         }
         // Mega evoluciones
         if (countMega === 1) {
@@ -1764,7 +1854,7 @@ function getForms(){
             { nombre: "groudonPrimal", clase: "logo-primal-k-icono", funcion: "startMegaEvo", index: groudonPrimal },
         ];
 
-        if(esImportante && formasArrayId.length != 0){
+        if(esImportante && formasArrayId.length != 0 || taurosPaldeaArrayId.length != 0 && pokemon.nombre != "Tauros"){
             formsScreen.innerHTML += `<div class="mega-evolution-container">
                                         <img src="img/flecha-izquierda-forma.png" class="mega-evolution-icon" onclick="
                                             passPreviousForm()">
@@ -1796,13 +1886,12 @@ function getForms(){
             }
         });
 
-        if(esImportante && formasArrayId.length != 0){
+        if(esImportante && formasArrayId.length != 0 || taurosPaldeaArrayId.length != 0 && pokemon.nombre != "Tauros"){
             formsScreen.innerHTML += `<div class="mega-evolution-container">
                                         <img src="img/flecha-derecha-forma.png" class="mega-evolution-icon" onclick="
                                             passNextForm()">
                                     </div>`
         }
-
     }else {
         formsScreen.innerHTML = "";
     }
@@ -2110,6 +2199,37 @@ function disableControls(disable) {
     }
 }
 
+let volumeInterval;
+
+document.addEventListener("keydown", function (event) {
+    const bgMusic = document.getElementById("bg-music");
+
+    if (volumeInterval) return; // evitar múltiples intervalos
+
+    if (event.key === "+" || event.key === "=") {
+        // Subir volumen
+        volumeInterval = setInterval(() => {
+            bgMusic.volume = Math.min(1, bgMusic.volume + 0.01);
+        }, 50);
+    } else if (event.key === "-") {
+        // Bajar volumen
+        volumeInterval = setInterval(() => {
+            bgMusic.volume = Math.max(0, bgMusic.volume - 0.01);
+        }, 50);
+    }
+});
+
+document.addEventListener("keyup", function (event) {
+    if (
+        event.key === "+" ||
+        event.key === "=" ||
+        event.key === "-"
+    ) {
+        clearInterval(volumeInterval);
+        volumeInterval = null;
+    }
+});
+
 function keyboardNavigation(event) {
     const isTyping = ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName);
 
@@ -2187,8 +2307,7 @@ function keyboardNavigation(event) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const audio = document.getElementById('bg-music');
-    audio.volume = 0.5; // Ajusta el volumen aquí (0.0 a
+    audio.volume = 0.2; // Ajusta el volumen aquí (0.0 a
 
     function enableMusic() {
         audio.play().catch(() => {});
