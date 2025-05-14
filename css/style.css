@@ -718,13 +718,15 @@ body {
     font-size: clamp(0.3rem, 1.5vw, 1rem);
     /* Definimos un gradiente que tenga zonas brillantes y normales */
     background: linear-gradient(
-        90deg,
-        #ff2121, 
-        #ff5b5b, 
-        #fff12b,
-        #ffed9b,
-        #ff2121
+        45deg, 
+        rgba(255, 255, 255, 0.6), 
+        rgba(255, 255, 255, 0.4), 
+        rgba(255, 215, 0, 0.8), 
+        rgba(255, 255, 255, 0.4), 
+        rgba(255, 255, 255, 0.6)
     );
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 15px rgba(255, 255, 255, 0.4);
     background-size: 200% auto; /* Permite animar el movimiento del gradiente */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -2203,7 +2205,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
-    height: 10%;
+    height: 14%;
     width: 90%;
 }
 
@@ -2214,11 +2216,13 @@ body {
     display: flex;
     width: 100%;
     color: white;
-    background-color: #8B1A1A; /* Puedes personalizar por tipo */
+    background-color: #8B1A1A;
     border: 1px solid #8B1A1A;
     clip-path: polygon(0 0, 85% 0, 100% 25%, 100% 100%, 0% 100%);
     cursor: pointer;
     transition: background 0.3s;
+    font-size: clamp(0.5rem, 1vw, 1rem);
+    height: 100%;
 }
 
 .typeContent:hover {
@@ -2236,7 +2240,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 55%;
-    background-color: #B0B0B0;
+    background-color: #414040;
     width: 90%;
     border-radius: 0 0 2vh 2vh;
     padding: 0.5vh; /* Opcional, para dar un poco de espacio interno */
@@ -2245,7 +2249,7 @@ body {
 
 .iconTypeStat {
     display: flex;
-    width: 1.8vw;
+    width: 2vw;
     aspect-ratio: 1;
     margin-right: 4px;
     position: relative;
@@ -2280,4 +2284,164 @@ body {
 /* Mostrar tooltip solo cuando haya hover sobre el contenedor correspondiente */
 .iconTypeStat:hover::after, .movement-categorie-container:hover::after, .movement-type-container:hover::after {
     opacity: 1;
+}
+
+.activeTypeWindow{
+    background-color: #e64a19;
+}
+
+.shiny-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+/* Estrella base sin animación por defecto */
+.star {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: yellow;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    opacity: 0;
+    transform: scale(0);
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.6), 0 0 15px rgba(255, 255, 0, 0.4); /* Suave resplandor amarillo */
+    animation: starShine 1s forwards;
+}
+
+/* Posiciones únicas */ 
+.star1,
+.star2,
+.star3,
+.star4,
+.star5,
+.star6,
+.star7,
+.star8 {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: yellow;
+    clip-path: polygon(
+        50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+        50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+    opacity: 0;
+}
+
+/* La animación usará una clase separada */
+.star.shine {
+    animation: starShine 1s forwards;
+}
+
+/* Solo scale y rotate, sin translate aquí */
+@keyframes starShine1 {
+    0%   { opacity: 0; transform: translate(-1vw, -3vh) scale(0) rotate(0deg); }
+    50%  { opacity: 1; transform: translate(-4vw, -6vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(-6vw, -6vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine2 {
+    0%   { opacity: 0; transform: translate(1vw, -2vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(4vw, -4vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(6vw, -6vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine3 {
+    0%   { opacity: 0; transform: translate(-2vw, 4vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(-5vw, 2vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(-6vw, 3vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine4 {
+    0%   { opacity: 0; transform: translate(1vw, 1vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(5vw, 3vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(6vw, 5vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine5 {
+    0%   { opacity: 0; transform: translate(0vw, 0vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(1vw, 2vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(3vw, 3vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine6 {
+    0%   { opacity: 0; transform: translate(-3vw, 2vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(-6vw, 3vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(-6vw, 5vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine7 {
+    0%   { opacity: 0; transform: translate(3vw, 3vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(6vw, 3vh) scale(3) rotate(180deg); }
+    100% { opacity: 0; transform: translate(6vw, 6vh) scale(0) rotate(360deg); }
+}
+
+@keyframes starShine8 {
+    0%   { opacity: 0; transform: translate(-4vw, -2vh) scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: translate(-6vw, -3vh) scale(4) rotate(180deg); }
+    100% { opacity: 0; transform: translate(-6vw, -5vh) scale(0) rotate(360deg); }
+}
+
+.shiny-sparkle-container{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    @keyframes starShine1 {
+        0%   { opacity: 0; transform: translate(-1vw, -3vh) scale(0) rotate(0deg); }
+        50%  { opacity: 1; transform: translate(-4vw, -6vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(-6vw, -6vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine2 {
+        0%   { opacity: 0; transform: translate(1vw, -2vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(4vw, -4vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(6vw, -6vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine3 {
+        0%   { opacity: 0; transform: translate(-2vw, 4vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(-5vw, 2vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(-6vw, 3vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine4 {
+        0%   { opacity: 0; transform: translate(1vw, 1vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(5vw, 3vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(6vw, 5vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine5 {
+        0%   { opacity: 0; transform: translate(0vw, 0vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(1vw, 2vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(3vw, 3vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine6 {
+        0%   { opacity: 0; transform: translate(-3vw, 2vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(-6vw, 3vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(-6vw, 5vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine7 {
+        0%   { opacity: 0; transform: translate(3vw, 3vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(6vw, 3vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(6vw, 6vh) scale(0) rotate(360deg); }
+    }
+
+    @keyframes starShine8 {
+        0%   { opacity: 0; transform: translate(-4vw, -2vh) scale(0) rotate(0deg); }
+        30%  { opacity: 1; transform: translate(-6vw, -3vh) scale(2) rotate(180deg); }
+        100% { opacity: 0; transform: translate(-6vw, -5vh) scale(0) rotate(360deg); }
+    }
 }

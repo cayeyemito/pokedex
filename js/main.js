@@ -104,6 +104,7 @@ let textNeutro = "";
 let textInmune = "";
 let textResistente = "";
 let textSuperResistente = "";
+let typeActive = ""
 
 async function initialize(numberPokedex) {
 
@@ -582,13 +583,39 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
 
 function showShiny(){
     let innerScreenOverlay = document.getElementById("inner-screen-overlay")
+    const animation = document.getElementById("shinyAnimation");
+    const stars = animation.querySelectorAll(".star");
 
-    if(!shinyChanged){
-        innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen_shiny}")`
-        shinyChanged = true
+    function restartStarAnimation() {
+        stars.forEach((star, index) => {
+            star.style.animation = "none"; // Detener la animación actual
+            void star.offsetWidth; // Forzar reflow para reiniciar la animación
+
+            // Asignar animación individual según el índice
+            star.style.animation = `starShine${index + 1} 1s ease forwards`;
+            star.style.animationDelay = `${index * 0.1}s`;
+        });
+    }
+
+    function stopStarAnimation() {
+        stars.forEach((star) => {
+            // Detener las animaciones de las estrellas y asegurarse de que no se vean
+            star.style.animation = "none"; // Detener cualquier animación pendiente
+            star.style.opacity = "0"; // Hacerlas invisibles
+            star.style.transform = "scale(0)"; // Restablecer tamaño
+        });
+    }
+
+    if (!shinyChanged) {
+        restartStarAnimation();
+
+        innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen_shiny || pokemon.imagen}")`;
+        shinyChanged = true;
     } else {
-        innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`
-        shinyChanged = false
+        stopStarAnimation();
+
+        innerScreenOverlay.style.backgroundImage = `url("${pokemon.imagen}")`;
+        shinyChanged = false;
     }
 }
 
@@ -1631,7 +1658,7 @@ async function createTypesInfo(){
     
     // X4 - Super Débil
     if (efectividades.superdebil && efectividades.superdebil.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x4')">X4</div>`;
+        typeHTML += `<div class="typeContent" id='superdebil' onclick="changeTypeEffectiveness('x4')">X4</div>`;
         for (let i = 0; i < efectividades.superdebil.length; i++) {
             textSuperE += generarImgTipo(efectividades.superdebil[i]);
         }
@@ -1639,7 +1666,7 @@ async function createTypesInfo(){
 
     // X2 - Débil
     if (efectividades.debil && efectividades.debil.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x2')">X2</div>`;
+        typeHTML += `<div class="typeContent" id='debil' onclick="changeTypeEffectiveness('x2')">X2</div>`;
         for (let i = 0; i < efectividades.debil.length; i++) {
             textDebil += generarImgTipo(efectividades.debil[i]);
         }
@@ -1647,7 +1674,7 @@ async function createTypesInfo(){
 
     // X1 - Neutro
     if (efectividades.neutro && efectividades.neutro.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1')">X1</div>`;
+        typeHTML += `<div class="typeContent" id='neutro' onclick="changeTypeEffectiveness('x1')">X1</div>`;
         for (let i = 0; i < efectividades.neutro.length; i++) {
             textNeutro += generarImgTipo(efectividades.neutro[i]);
         }
@@ -1655,7 +1682,7 @@ async function createTypesInfo(){
 
     // X1/2 - Resistente
     if (efectividades.resistente && efectividades.resistente.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1/2')">X1/2</div>`;
+        typeHTML += `<div class="typeContent" id='resistente' onclick="changeTypeEffectiveness('x1/2')">X1/2</div>`;
         for (let i = 0; i < efectividades.resistente.length; i++) {
             textResistente += generarImgTipo(efectividades.resistente[i]);
         }
@@ -1663,7 +1690,7 @@ async function createTypesInfo(){
 
     // X1/4 - Superresistente
     if (efectividades.superresistente && efectividades.superresistente.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1/4')">X1/4</div>`;
+        typeHTML += `<div class="typeContent" id='superresistente' onclick="changeTypeEffectiveness('x1/4')">X1/4</div>`;
         for (let i = 0; i < efectividades.superresistente.length; i++) {
             textSuperResistente += generarImgTipo(efectividades.superresistente[i]);
         }
@@ -1671,7 +1698,7 @@ async function createTypesInfo(){
 
     // X0 - Inmune
     if (efectividades.inmune && efectividades.inmune.length > 0) {
-        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x0')">X0</div>`;
+        typeHTML += `<div class="typeContent" id='inmune' onclick="changeTypeEffectiveness('x0')">X0</div>`;
         for (let i = 0; i < efectividades.inmune.length; i++) {
             textInmune += generarImgTipo(efectividades.inmune[i]);
         }
@@ -1684,8 +1711,10 @@ async function createTypesInfo(){
                                 <div class="typeAll" id="typeAll">
                                 </div>
                             </div>`;
-                      
-    changeTypeEffectiveness('x1')
+    let typeContentAll = document.getElementById("typeAll")
+    typeContentAll.innerHTML = textNeutro;
+    typeActive = "neutro"
+    document.getElementById(`${typeActive}`).classList.add("active");
 }
 
 let allPokemonsForTyping = [];
@@ -2389,29 +2418,26 @@ function animacionFlechas(){
     animate();
 }
 
-function changeTypeEffectiveness(weakness){
-    let typeContentAll = document.getElementById("typeAll")
-    switch (weakness) {
-        case "x4":
-            typeContentAll.innerHTML = textSuperE;
-            break;
-        case "x2":
-            typeContentAll.innerHTML = textDebil;
-            break;
-        case "x1":
-            typeContentAll.innerHTML = textNeutro;
-            break;
-        case "x0":
-            typeContentAll.innerHTML = textInmune;
-            break;
-        case "x1/2":
-            typeContentAll.innerHTML = textResistente;
-            break;
-        case "x1/4":
-            typeContentAll.innerHTML = textSuperResistente;
-            break;
-    }    
+function changeTypeEffectiveness(weakness) {
+    const typeContentAll = document.getElementById("typeAll");
+    const effectivenessMap = {
+        "x4": { id: "superdebil", content: textSuperE },
+        "x2": { id: "debil", content: textDebil },
+        "x1": { id: "neutro", content: textNeutro },
+        "x0": { id: "inmune", content: textInmune },
+        "x1/2": { id: "resistente", content: textResistente },
+        "x1/4": { id: "superresistente", content: textSuperResistente }
+    };
+
+    const selected = effectivenessMap[weakness];
+    if (!selected) return;
+
+    document.getElementById(typeActive)?.classList.remove("activeTypeWindow");
+    typeActive = selected.id;
+    document.getElementById(typeActive)?.classList.add("activeTypeWindow");
+    typeContentAll.innerHTML = selected.content;
 }
+
 
 function traducirTipo(tipoIngles) {
     const traducciones = {
