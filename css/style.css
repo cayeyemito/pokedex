@@ -1851,13 +1851,6 @@ body {
 .typeSection {
     display: flex;
     flex-direction: column;
-    gap: 0.7vh;
-}
-
-.iconTypeStat{
-    width: 1.1vw;
-    aspect-ratio: 1;
-    margin-right: 0.2;
 }
 
 .pokemon-list-container {
@@ -2192,4 +2185,99 @@ body {
   to {
     transform: rotate(.5turn);
   }
+}
+
+.up-animate {
+    transform: translateY(-4px);
+    filter: brightness(100%);
+    transition: transform 0.1s, filter 0.1s;
+}
+
+.down-animate {
+    transform: translateY(4px);
+    filter: brightness(100%);
+    transition: transform 0.1s, filter 0.1s;
+}
+
+.typeHeader{
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 10%;
+    width: 90%;
+}
+
+.typeContent {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    color: white;
+    background-color: #8B1A1A; /* Puedes personalizar por tipo */
+    border: 1px solid #8B1A1A;
+    clip-path: polygon(0 0, 85% 0, 100% 25%, 100% 100%, 0% 100%);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.typeContent:hover {
+    background-color: #e64a19;
+}
+
+.typeSection{
+    height: 100%;
+    justify-content: center;
+}
+
+.typeAll {
+    display: flex;
+    flex-wrap: wrap; /* <-- Esto permite el salto de línea */
+    align-items: center;
+    justify-content: center;
+    height: 55%;
+    background-color: #B0B0B0;
+    width: 90%;
+    border-radius: 0 0 2vh 2vh;
+    padding: 0.5vh; /* Opcional, para dar un poco de espacio interno */
+    gap: 0.5vh; /* Opcional, para espacio entre íconos */
+}
+
+.iconTypeStat {
+    display: flex;
+    width: 1.8vw;
+    aspect-ratio: 1;
+    margin-right: 4px;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconTypeStat img {
+    width: 100%;
+    height: auto;
+    pointer-events: none; /* Para que el hover se detecte sobre el div, no la imagen */
+}
+
+.iconTypeStat::after, .movement-categorie-container::after, .movement-type-container::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ff5b5b;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 10;
+}
+
+/* Mostrar tooltip solo cuando haya hover sobre el contenedor correspondiente */
+.iconTypeStat:hover::after, .movement-categorie-container:hover::after, .movement-type-container:hover::after {
+    opacity: 1;
 }

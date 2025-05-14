@@ -25,6 +25,7 @@ let pokemonScreenGlass = document.getElementById("inner-screen-overlay-glass")
 let abilityContainer = document.getElementById("abilityContainer")
 let basicInfoContainer = document.getElementById("basicInfo")
 let typeScreen = document.getElementById("typeScreen")
+let guideScreen = document.getElementById("guide-screen")
 let chartInstance;
 let habilidades
 let movimientos = {
@@ -97,6 +98,12 @@ let galarZenId
 let taurosPaldea
 let taurosPaldeaArrayId = []
 const audio = document.getElementById('bg-music');
+let textSuperE = "";
+let textDebil = "";
+let textNeutro = "";
+let textInmune = "";
+let textResistente = "";
+let textSuperResistente = "";
 
 async function initialize(numberPokedex) {
 
@@ -321,22 +328,30 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function showGuide(){
-    let guideScreen = document.getElementById("guide-screen")
-
-    if(!guideChanged){
-        innerScreen.style.filter = "blur(1.5rem)"
-        innerScreenOverlay.style.visibility = "blur(1.5rem)"
-        guideScreen.style.visibility = "visible"
-        guideChanged = true
-    } else{
-        innerScreen.style.filter = "blur(0)"
-        innerScreenOverlay.style.visibility = "blur(0)"
-        guideScreen.style.visibility = "hidden"
+    if (getComputedStyle(filterScreen).visibility === "visible") {
+        filterScreen.style.visibility = "hidden";
         guideChanged = false
     }
+    if (!guideChanged) {
+        innerScreen.style.filter = "blur(1.5rem)";
+        innerScreenOverlay.style.filter = "blur(1.5rem)";
+        guideScreen.style.visibility = "visible";
+        guideChanged = true;
+    } else {
+        innerScreen.style.filter = "blur(0)";
+        innerScreenOverlay.style.filter = "blur(0)";
+        guideScreen.style.visibility = "hidden";
+        guideChanged = false;
+    }    
 }
 
 async function showFilter(){
+    if (getComputedStyle(guideScreen).visibility === "visible") {
+        guideScreen.style.visibility = "hidden";
+        innerScreen.style.filter = "blur(0)";
+        innerScreenOverlay.style.filter = "blur(0)";
+        guideChanged = false
+    }
     if(!guideChanged){
         let limits = {};
         overlayNotTouch.style.display = "flex";
@@ -600,12 +615,18 @@ function passNextStat() {
         isMovementsOptions = true;
         statsScreen.style.visibility = "hidden";
         movementScreen.style.visibility = "visible";
+        if(isChanged === true){
+            animacionFlechas();
+        }
         stat3.style.transform = "scale(1.3)";
         stat2.style.transform = "scale(1)";
         stat++;
     } else if (stat === 3) {
         evolutionScreen.style.visibility = "visible";
         movementScreen.style.visibility = "hidden";
+        if(comprobacion.length>1){
+            animacionFlechas();
+        }
         stat4.style.transform = "scale(1.3)";
         stat3.style.transform = "scale(1)";
         isMovementsOptions = false;
@@ -613,6 +634,9 @@ function passNextStat() {
     } else if (stat === 4) {
         abilityScreen.style.visibility = "visible";
         evolutionScreen.style.visibility = "hidden";
+        if(habilidades.length > 1){
+            animacionFlechas();
+        }
         stat5.style.transform = "scale(1.3)";
         stat4.style.transform = "scale(1)";
         stat++;
@@ -665,18 +689,27 @@ function passPreviousStat() {
         isMovementsOptions = true;
         movementScreen.style.visibility = "visible";
         evolutionScreen.style.visibility = "hidden";
+        if(isChanged === true){
+            animacionFlechas();
+        }
         stat3.style.transform = "scale(1.3)";
         stat4.style.transform = "scale(1)";
         stat--;
     } else if (stat === 5) {
         evolutionScreen.style.visibility = "visible";
         abilityScreen.style.visibility = "hidden";
+        if(comprobacion.length>1){
+            animacionFlechas();
+        }
         stat4.style.transform = "scale(1.3)";
         stat5.style.transform = "scale(1)";
         stat--;
     } else if (stat === 6) {
         abilityScreen.style.visibility = "visible";
         typeScreen.style.visibility = "hidden";
+        if(habilidades.length > 1){
+            animacionFlechas();
+        }
         stat5.style.transform = "scale(1.3)";
         stat6.style.transform = "scale(1)";
         stat--;
@@ -1244,6 +1277,7 @@ async function passNextAttack() {
 
         const movimientosTipo = movimientos[tipoClave];
         if (!movimientosTipo || movimientosTipo.length === 0) return;
+        
 
         idMovimiento = (idMovimiento === movimientosTipo.length - 1)
             ? 0
@@ -1254,10 +1288,16 @@ async function passNextAttack() {
             ? 0
             : idAbility + 1;
         createAbiltyInfo()
+        if(habilidades.length>1){
+            animacionFlechas();
+        }
     } else if(stat === 4 && comprobacion.length > 0){
         idEvolucion = (idEvolucion === comprobacion.length - 1)
             ? 0
             : idEvolucion + 1;
+        if(comprobacion.length>1){
+            animacionFlechas();
+        }
         createEvolutionChain()
     }
 }
@@ -1281,6 +1321,8 @@ async function passPreviousAttack() {
 
         if (!movimientosTipo || movimientosTipo.length === 0) return;
 
+        animacionFlechas();
+
         idMovimiento = (idMovimiento === 0)
             ? movimientosTipo.length - 1
             : idMovimiento - 1;
@@ -1290,11 +1332,17 @@ async function passPreviousAttack() {
         idAbility = (idAbility === 0)
             ? habilidades.length - 1
             : idAbility - 1;
+        if(habilidades.length>1){
+            animacionFlechas();
+        }
         createAbiltyInfo()
     } else if(stat === 4 && comprobacion.length > 0){
         idEvolucion = (idEvolucion ===0)
             ? comprobacion.length - 1
             : idEvolucion - 1;
+        if(comprobacion.length>1){
+            animacionFlechas();
+        }
         createEvolutionChain()
     }
 }
@@ -1347,10 +1395,10 @@ async function showMovements(num){
                                     <div class="movement-level-container">
                                         <h1 class="movement-name-text-level">${level}</h1>
                                     </div>
-                                    <div class="movement-type-container">
+                                    <div class="movement-type-container" data-tooltip="${traducirTipo(arrayMoves[idMovimiento].tipo)}">
                                         <img src="img/iconos_tipos/Icon_${arrayMoves[idMovimiento].tipo}.webp" class="icono-ataques-tipo">
                                     </div>
-                                    <div class="movement-categorie-container">
+                                    <div class="movement-categorie-container" data-tooltip="${traducirCategorias(arrayMoves[idMovimiento].categoria)}">
                                         <img src="img/categorias/${arrayMoves[idMovimiento].categoria}.png" class="icono-ataques-categoria">
                                     </div>
                                 </div>
@@ -1374,6 +1422,7 @@ async function showMovements(num){
                                         <img src="img/cerrar.png" class="icono-cruz" onclick="showMovementsOptions(1)")>
                                     </div>
                                 </div>`
+    animacionFlechas();
 }
 
 function showMovementsOptions(numMov) {
@@ -1416,7 +1465,7 @@ function showMovementsOptions(numMov) {
 function createBasicInfo(){
 
     if(pokemon.tipo_secundario != null){
-        tipo2 = `<div class="movement-categorie-container">
+        tipo2 = `<div class="movement-categorie-container" data-tooltip="${traducirTipo(pokemon.tipo_secundario)}">
                     <img src="img/iconos_tipos/Icon_${pokemon.tipo_secundario}.webp" class="icono-ataques-tipo">
                 </div>`;
         widht = "bigWidht"
@@ -1441,7 +1490,7 @@ function createBasicInfo(){
                                         <div class="movement-title-container ${widht}">
                                             <h1 class="movement-name-text line-ability">${nombre} ${idMotrada}</h1>
                                         </div>
-                                        <div class="movement-type-container">
+                                        <div class="movement-type-container" data-tooltip="${traducirTipo(pokemon.tipo)}">
                                             <img src="img/iconos_tipos/Icon_${pokemon.tipo}.webp" class="icono-ataques-tipo">
                                         </div>
                                         ${tipo2}
@@ -1557,6 +1606,13 @@ async function createTypesInfo(){
     const key = Object.keys(resultado[0])[0]; // Extraemos la única clave
     const texto = resultado[0][key]; // El contenido de efectividades
 
+    textSuperE = "";
+    textDebil = "";
+    textNeutro = "";
+    textInmune = "";
+    textResistente = "";
+    textSuperResistente = "";
+
     const lineas = texto.split('\n');
     const efectividades = {};
 
@@ -1571,75 +1627,65 @@ async function createTypesInfo(){
         efectividades[categoria] = efectividades[categoria].map(e => e.toLowerCase());
     }
 
-    let textSuperE = "";
-    let textDebil = "";
-    let textNeutro = "";
-    let textInmune = "";
-    let textResistente = "";
-    let textSuperResistente = "";
-
-    // Supereficaz
+    let typeHTML = ""
+    
+    // X4 - Super Débil
     if (efectividades.superdebil && efectividades.superdebil.length > 0) {
-        textSuperE += `<h3 class="typeText">Supereficaz: `;
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x4')">X4</div>`;
         for (let i = 0; i < efectividades.superdebil.length; i++) {
-            textSuperE += `<img src="img/iconos_tipos/Icon_${efectividades.superdebil[i]}.webp" class="iconTypeStat">`;
+            textSuperE += generarImgTipo(efectividades.superdebil[i]);
         }
-        textSuperE += `</h3>`;
     }
 
-    // Eficaz (débil)
+    // X2 - Débil
     if (efectividades.debil && efectividades.debil.length > 0) {
-        textDebil += `<h3 class="typeText">Eficaz: `;
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x2')">X2</div>`;
         for (let i = 0; i < efectividades.debil.length; i++) {
-            textDebil += `<img src="img/iconos_tipos/Icon_${efectividades.debil[i]}.webp" class="iconTypeStat">`;
+            textDebil += generarImgTipo(efectividades.debil[i]);
         }
-        textDebil += `</h3>`;
     }
 
-    // Neutro
+    // X1 - Neutro
     if (efectividades.neutro && efectividades.neutro.length > 0) {
-        textNeutro += `<h3 class="typeText">Neutro: `;
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1')">X1</div>`;
         for (let i = 0; i < efectividades.neutro.length; i++) {
-            textNeutro += `<img src="img/iconos_tipos/Icon_${efectividades.neutro[i]}.webp" class="iconTypeStat">`;
+            textNeutro += generarImgTipo(efectividades.neutro[i]);
         }
-        textNeutro += `</h3>`;
     }
 
-    // Inmune
-    if (efectividades.inmune && efectividades.inmune.length > 0) {
-        textInmune += `<h3 class="typeText">Inmune: `;
-        for (let i = 0; i < efectividades.inmune.length; i++) {
-            textInmune += `<img src="img/iconos_tipos/Icon_${efectividades.inmune[i]}.webp" class="iconTypeStat">`;
-        }
-        textInmune += `</h3>`;
-    }
-
-    // Resistente
+    // X1/2 - Resistente
     if (efectividades.resistente && efectividades.resistente.length > 0) {
-        textResistente += `<h3 class="typeText">Resistente: `;
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1/2')">X1/2</div>`;
         for (let i = 0; i < efectividades.resistente.length; i++) {
-            textResistente += `<img src="img/iconos_tipos/Icon_${efectividades.resistente[i]}.webp" class="iconTypeStat">`;
+            textResistente += generarImgTipo(efectividades.resistente[i]);
         }
-        textResistente += `</h3>`;
     }
 
-    // Superresistente
+    // X1/4 - Superresistente
     if (efectividades.superresistente && efectividades.superresistente.length > 0) {
-        textSuperResistente += `<h3 class="typeText">Superresistente: `;
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x1/4')">X1/4</div>`;
         for (let i = 0; i < efectividades.superresistente.length; i++) {
-            textSuperResistente += `<img src="img/iconos_tipos/Icon_${efectividades.superresistente[i]}.webp" class="iconTypeStat">`;
+            textSuperResistente += generarImgTipo(efectividades.superresistente[i]);
         }
-        textSuperResistente += `</h3>`;
+    }
+
+    // X0 - Inmune
+    if (efectividades.inmune && efectividades.inmune.length > 0) {
+        typeHTML += `<div class="typeContent" onclick="changeTypeEffectiveness('x0')">X0</div>`;
+        for (let i = 0; i < efectividades.inmune.length; i++) {
+            textInmune += generarImgTipo(efectividades.inmune[i]);
+        }
     }
 
     typeScreen.innerHTML = `<div class="typeSection">
-        ${textSuperE}
-        ${textDebil}
-        ${textNeutro}
-        ${textInmune}
-        ${textResistente}
-        ${textSuperResistente}
-    </div>`;
+                                <div class="typeHeader">
+                                    ${typeHTML}
+                                </div>
+                                <div class="typeAll" id="typeAll">
+                                </div>
+                            </div>`;
+                      
+    changeTypeEffectiveness('x1')
 }
 
 let allPokemonsForTyping = [];
@@ -2321,3 +2367,89 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Event listener para las teclas, solo se habilita cuando no se está cargando
 document.addEventListener('keydown', keyboardNavigation);
+
+function animacionFlechas(){
+    buttonUp = document.getElementById("pass-previous-attack")
+    bottonDown = document.getElementById("pass-next-attack")
+
+    let countForAnim = 0;
+    const animate = () => {
+        if (countForAnim >= 3) return;
+        buttonUp.classList.add('up-animate');
+        bottonDown.classList.add('down-animate');
+  
+        setTimeout(() => {
+            buttonUp.classList.remove('up-animate');
+            bottonDown.classList.remove('down-animate');
+            countForAnim++;
+            setTimeout(animate, 200); // tiempo entre pulsos
+        }, 100); // duración de cada "pulsación"
+    };
+
+    animate();
+}
+
+function changeTypeEffectiveness(weakness){
+    let typeContentAll = document.getElementById("typeAll")
+    switch (weakness) {
+        case "x4":
+            typeContentAll.innerHTML = textSuperE;
+            break;
+        case "x2":
+            typeContentAll.innerHTML = textDebil;
+            break;
+        case "x1":
+            typeContentAll.innerHTML = textNeutro;
+            break;
+        case "x0":
+            typeContentAll.innerHTML = textInmune;
+            break;
+        case "x1/2":
+            typeContentAll.innerHTML = textResistente;
+            break;
+        case "x1/4":
+            typeContentAll.innerHTML = textSuperResistente;
+            break;
+    }    
+}
+
+function traducirTipo(tipoIngles) {
+    const traducciones = {
+        normal: "Normal",
+        fire: "Fuego",
+        water: "Agua",
+        electric: "Eléctrico",
+        grass: "Planta",
+        ice: "Hielo",
+        fighting: "Lucha",
+        poison: "Veneno",
+        ground: "Tierra",
+        flying: "Volador",
+        psychic: "Psíquico",
+        bug: "Bicho",
+        rock: "Roca",
+        ghost: "Fantasma",
+        dragon: "Dragón",
+        dark: "Siniestro",
+        steel: "Acero",
+        fairy: "Hada"
+    };
+
+    return traducciones[tipoIngles] || tipoIngles.charAt(0).toUpperCase() + tipoIngles.slice(1);
+}
+
+function generarImgTipo(tipo) {
+    return `<div class="iconTypeStat" data-tooltip="${traducirTipo(tipo)}">
+                <img src="img/iconos_tipos/Icon_${tipo}.webp" alt="${tipo}">
+            </div>`;
+}
+
+function traducirCategorias(categoriaIngles) {
+    const traducciones = {
+        physical: "Físico",
+        special: "Especial",
+        status: "Estado"
+    };
+
+    return traducciones[categoriaIngles] || categoriaIngles.charAt(0).toUpperCase() + categoriaIngles.slice(1);
+}
