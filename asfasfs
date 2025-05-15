@@ -121,4 +121,4 @@ WITH RECURSIVE PreEvolutionChain AS (
             GROUP BY final_id
         )
     ) prec ON prec.final_id = p.id
-    GROUP BY p.id
+GROUP BY p.id

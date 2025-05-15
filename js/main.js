@@ -505,7 +505,9 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
 
     const esTipo = pokemonTypes.includes(valor);
     const esGeneracion = generations.includes(valor);
-
+    if(alturaMinMax){
+        hasFilter = true
+    }
     if (valor) filterTypeNew = valor;
 
     if (!hasFilter && filterTypeOld != filterTypeNew) {
@@ -571,6 +573,9 @@ async function establecerFiltro(valor = null, alturaMinMax = null) {
     } catch (error) {
         console.error("Error al obtener datos:", error);
     }
+
+    console.log(arrayFiltroId[idPokemonFilter].numero_pokedex)
+
     initialize(arrayFiltroId[idPokemonFilter]?.numero_pokedex ?? id).finally(() => {
         blueButton.classList.remove("parpadeando");
         overlayNotTouch.style.display = "none";
@@ -1714,7 +1719,7 @@ async function createTypesInfo(){
     let typeContentAll = document.getElementById("typeAll")
     typeContentAll.innerHTML = textNeutro;
     typeActive = "neutro"
-    document.getElementById(`${typeActive}`).classList.add("active");
+    document.getElementById(`${typeActive}`).classList.add("activeTypeWindow");
 }
 
 let allPokemonsForTyping = [];

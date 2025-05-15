@@ -2248,11 +2248,9 @@ body {
 }
 
 .iconTypeStat {
-    display: flex;
-    width: 2vw;
+    width: clamp(1vh, 3vw, 3vh);  /* Se adapta entre 1rem y 2rem dependiendo del viewport */
     aspect-ratio: 1;
-    margin-right: 4px;
-    position: relative;
+    display: flex;
     justify-content: center;
     align-items: center;
 }

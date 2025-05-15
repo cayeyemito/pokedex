@@ -40,7 +40,7 @@ if(isset($_REQUEST["numero"])){
         exit();
     }
 
-    $stmt = $conn->prepare("SELECT * FROM pokemon_all_info HAVING numero_pokedex = ?");
+    $stmt = $conn->prepare("CALL ObtenerInfoCompletaPokemon('pokemon', ?, NULL);");
     if (!$stmt) {
         http_response_code(500);
         $response = [
@@ -95,7 +95,7 @@ if(isset($_REQUEST["numero"])){
 
     $tipoLike = "%" . $tipo . "%"; // Para usar con LIKE
 
-    $stmt = $conn->prepare("CALL filtrarPorTipo(?)");
+    $stmt = $conn->prepare("CALL FiltrarPokemonPorCriterio('tipo', 0, 0, ?);");
     if (!$stmt) {
         http_response_code(500);
         $response = [
@@ -154,7 +154,7 @@ if(isset($_REQUEST["numero"])){
 
     $generacionLike = "%" . $generacion . "%"; // Para usar con LIKE
 
-    $stmt = $conn->prepare("CALL filtrarPorGeneracion(?)");
+    $stmt = $conn->prepare("CALL FiltrarPokemonPorCriterio('generacion', 0, 0, ?);");
     if (!$stmt) {
         http_response_code(500);
         $response = [
@@ -218,16 +218,12 @@ if(isset($_REQUEST["numero"])){
     // Determinar qué tipo de filtro aplicar
     if ($alturaMin !== null && $alturaMax !== null && $pesoMin === null && $pesoMax === null) {
         // Solo filtro por altura
-        $stmt = $conn->prepare("CALL filtrarPorAltura(?, ?)");
+        $stmt = $conn->prepare("CALL FiltrarPokemonPorCriterio('altura', ?, ?, '');");
         $stmt->bind_param("dd", $alturaMin, $alturaMax);
     } elseif ($pesoMin !== null && $pesoMax !== null && $alturaMin === null && $alturaMax === null) {
         // Solo filtro por peso
-        $stmt = $conn->prepare("CALL filtrarPorPeso(?, ?)");
+        $stmt = $conn->prepare("CALL FiltrarPokemonPorCriterio('peso', ?, ?, '');");
         $stmt->bind_param("dd", $pesoMin, $pesoMax);
-    } elseif ($alturaMin !== null && $alturaMax !== null && $pesoMin !== null && $pesoMax !== null) {
-        // Ambos filtros a la vez
-        $stmt = $conn->prepare("CALL filtrarPorAlturaYPeso(?, ?, ?, ?)");
-        $stmt->bind_param("dddd", $alturaMin, $alturaMax, $pesoMin, $pesoMax);
     } else {
         http_response_code(400);
         echo json_encode([

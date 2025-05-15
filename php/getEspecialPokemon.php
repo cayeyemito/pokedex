@@ -41,7 +41,7 @@ if ($conn->connect_error) {
 }
 
 // Usar WHERE en lugar de HAVING
-$stmt = $conn->prepare("SELECT * FROM pokemon_special_all_info WHERE numero_pokedex = ?");
+$stmt = $conn->prepare("CALL ObtenerInfoCompletaPokemon('especial', ?, NULL);");
 if (!$stmt) {
     http_response_code(500);
     $response = [

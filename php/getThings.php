@@ -25,7 +25,7 @@ if (isset($_REQUEST["habilidad"])) {
         exit();
     }
 
-    $stmt = $conn->prepare("SELECT nombre, descripcion FROM Habilidades WHERE id = ?");
+    $stmt = $conn->prepare("CALL ObtenerInfoCompletaPokemon('habilidad', NULL, ?);");
     if (!$stmt) {
         http_response_code(500);
         echo json_encode([
